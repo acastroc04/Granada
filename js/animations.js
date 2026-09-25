@@ -8,7 +8,7 @@
  * como si las empujaras suavemente sobre la mesa.
  */
 export function initMouseParallax() {
-  const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+  const isDesktop = window.matchMedia('(min-width: 769px)').matches;
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (!isDesktop || prefersReduced) return;

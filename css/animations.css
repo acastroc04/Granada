@@ -98,12 +98,11 @@
 
 .anim-btn {
   opacity: 0;
-  animation: fadeUp 0.8s 1.3s ease forwards;
-}
-
-/* Button pulsing glow after it appears */
-.btn-empezar {
-  animation: pulseGlow 3s 2.5s ease-in-out infinite;
+  /* Both effects must share the same declaration: a later animation
+     shorthand would otherwise cancel the entrance and keep opacity at 0. */
+  animation:
+    fadeUp 0.8s 1.3s ease forwards,
+    pulseGlow 3s 2.5s ease-in-out infinite;
 }
 
 .anim-footer-text {
