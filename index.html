@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="description" content="Descubre Granada — su Alhambra, el Albaicín, flamenco, tapas y los rincones más mágicos de Andalucía. Una experiencia vintage interactiva.">
+  <meta name="theme-color" content="#faf6f0">
+
+  <title>Granada — Recuerdos de Andalucía</title>
+
+  <!-- Preconnect Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Favicon: pomegranate emoji as SVG -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏰</text></svg>">
+</head>
+<body>
+
+  <!-- ==================== LOADER ==================== -->
+  <div id="loader" aria-hidden="true">
+    <div class="loader-ornament"></div>
+    <span class="loader-text">Preparando tu viaje…</span>
+  </div>
+
+  <!-- ==================== LANDING ==================== -->
+  <main class="landing" id="landing">
+
+    <!-- Top gold line -->
+    <div class="vintage-border-top" aria-hidden="true"></div>
+
+    <!-- Header -->
+    <header class="header">
+      <span class="header__ornament" aria-hidden="true">✦ ✦ ✦</span>
+      <h1 class="header__title">Granada</h1>
+      <p class="header__subtitle">Recuerdos de Andalucía</p>
+      <div class="header__line" aria-hidden="true"></div>
+    </header>
+
+    <!-- Collage of 6 vintage "recortes" -->
+    <section class="collage" aria-label="Recortes vintage de Granada">
+
+      <!-- 1. Alhambra — wide/panoramic -->
+      <article class="recorte recorte--wide recorte--landscape">
+        <img
+          class="recorte__img"
+          src="images/alhambra.jpg"
+          alt="La Alhambra de Granada con Sierra Nevada al fondo"
+          loading="eager"
+          decoding="async"
+        >
+        <span class="recorte__caption">La Alhambra · Joya Nazarí</span>
+      </article>
+
+      <!-- 2. Catedral — portrait -->
+      <article class="recorte recorte--portrait">
+        <img
+          class="recorte__img"
+          src="images/catedral.jpg"
+          alt="Catedral de Granada, arquitectura barroca"
+          loading="lazy"
+          decoding="async"
+        >
+        <span class="recorte__caption">Catedral de Granada</span>
+      </article>
+
+      <!-- 3. Albaicín — landscape -->
+      <article class="recorte recorte--landscape">
+        <img
+          class="recorte__img"
+          src="images/albaicin.jpg"
+          alt="Calles del barrio del Albaicín con casas blancas y flores"
+          loading="lazy"
+          decoding="async"
+        >
+        <span class="recorte__caption">El Albaicín</span>
+      </article>
+
+      <!-- 4. Flamenco — portrait -->
+      <article class="recorte recorte--portrait">
+        <img
+          class="recorte__img"
+          src="images/flamenco.jpg"
+          alt="Bailaora de flamenco en un patio de Granada"
+          loading="lazy"
+          decoding="async"
+        >
+        <span class="recorte__caption">Flamenco · Alma Gitana</span>
+      </article>
+
+      <!-- 5. Mirador — panoramic / wide -->
+      <article class="recorte recorte--wide recorte--pano">
+        <img
+          class="recorte__img"
+          src="images/mirador.jpg"
+          alt="Vista de la Alhambra desde el Mirador de San Nicolás al atardecer"
+          loading="lazy"
+          decoding="async"
+        >
+        <span class="recorte__caption">Mirador de San Nicolás · Atardecer</span>
+      </article>
+
+      <!-- 6. Tapas — landscape -->
+      <article class="recorte recorte--landscape">
+        <img
+          class="recorte__img"
+          src="images/tapas.jpg"
+          alt="Tapas tradicionales con granadas y vino en una terraza de Granada"
+          loading="lazy"
+          decoding="async"
+        >
+        <span class="recorte__caption">Tapas & Granadas</span>
+      </article>
+
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <p class="cta-quote">
+        Dale limosna, mujer, que no hay en la vida nada como la pena de ser ciego en Granada
+      </p>
+      <a href="#" class="btn-empezar" id="btn-empezar" role="button">
+        Empezar
+        <span class="btn-empezar__arrow" aria-hidden="true">→</span>
+      </a>
+    </section>
+
+    <!-- Footer ornament -->
+    <footer class="footer-ornament" aria-hidden="true">
+      <div class="footer-ornament__line"></div>
+      <span class="footer-ornament__text">~ Granada, España ~</span>
+    </footer>
+
+  </main>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script>
+    // --- Loader ---
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('loader');
+      // Small delay so animations feel intentional
+      setTimeout(() => {
+        loader.classList.add('hidden');
+        loader.addEventListener('transitionend', () => {
+          loader.style.display = 'none';
+        }, { once: true });
+      }, 800);
+    });
+
+    // --- Intersection Observer for scroll animations ---
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.animationPlayState = 'running';
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+      );
+
+      document.querySelectorAll('.recorte').forEach((el) => {
+        el.style.animationPlayState = 'paused';
+        observer.observe(el);
+      });
+    }
+
+    // --- Parallax-lite on desktop for recortes ---
+    if (window.matchMedia('(min-width: 768px)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const recortes = document.querySelectorAll('.recorte');
+      let ticking = false;
+
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            const scrollY = window.scrollY;
+            recortes.forEach((el, i) => {
+              const speed = (i % 2 === 0) ? 0.02 : -0.015;
+              el.style.setProperty('--parallax-y', `${scrollY * speed}px`);
+            });
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+    }
+  </script>
+
+</body>
+</html>
