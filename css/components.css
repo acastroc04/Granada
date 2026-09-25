@@ -1,6 +1,5 @@
 /* ============================================
-   COMPONENTS — Elementos reutilizables
-   Recortes, botones, loader
+   COMPONENTS — Fotos esparcidas, botón, loader
    ============================================ */
 
 /* ========== LOADER ========== */
@@ -8,7 +7,7 @@
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background: var(--cream);
+  background: var(--wood-base);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -34,126 +33,129 @@
   margin-top: var(--space-md);
   font-family: var(--font-script);
   font-size: 1.4rem;
-  color: var(--sepia);
+  color: var(--sepia-light);
   letter-spacing: 0.05em;
 }
 
-/* ========== RECORTE (Photo Clipping) ========== */
-.recorte {
-  position: relative;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background: #fff;
+/* ========== FOTO ESPARCIDA (Scattered Photo) ========== */
+.foto {
+  position: absolute;
+  pointer-events: auto;
+  cursor: default;
+  /* White polaroid-style border */
+  background: #fffcf5;
+  padding: 6px 6px 22px 6px;
+  border-radius: 2px;
   box-shadow:
-    0 4px 16px var(--shadow),
-    0 1px 3px rgba(0, 0, 0, 0.08);
+    0 4px 20px rgba(0, 0, 0, 0.35),
+    0 1px 4px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.05);
   transition:
     transform var(--duration-med) var(--ease-smooth),
-    box-shadow var(--duration-fast) ease;
-  cursor: default;
+    box-shadow var(--duration-fast) ease,
+    z-index 0s;
+  z-index: 3;
 }
 
-/* Dark mode card bg */
-@media (prefers-color-scheme: dark) {
-  .recorte { background: var(--parchment); }
-}
-
-/* Tape strip decoration */
-.recorte::before {
+/* Slight yellowed edges */
+.foto::before {
   content: '';
   position: absolute;
-  top: -6px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-2deg);
-  width: 60px;
-  height: 20px;
-  background: rgba(232, 218, 190, 0.7);
+  inset: 0;
   border-radius: 2px;
-  z-index: 3;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 0 15px rgba(180, 150, 100, 0.15);
+  pointer-events: none;
 }
 
-.recorte:nth-child(even)::before {
-  transform: translateX(-50%) rotate(3deg);
-  background: rgba(200, 218, 230, 0.65);
+/* Hover: lift up & straighten */
+.foto:hover {
+  transform: rotate(0deg) scale(1.08) translateY(-8px) !important;
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 20;
 }
 
-.recorte:nth-child(3n)::before {
-  background: rgba(220, 200, 200, 0.65);
-}
-
-/* Slight random rotations via custom property */
-.recorte:nth-child(1) { --rot: -2.2deg; }
-.recorte:nth-child(2) { --rot:  1.5deg; }
-.recorte:nth-child(3) { --rot: -1deg;   }
-.recorte:nth-child(4) { --rot:  2.5deg; }
-.recorte:nth-child(5) { --rot: -1.8deg; }
-.recorte:nth-child(6) { --rot:  1deg;   }
-
-.recorte {
-  transform: rotate(var(--rot, 0deg));
-}
-
-/* Hover lift & straighten */
-.recorte:hover {
-  transform: rotate(0deg) scale(1.03);
-  box-shadow: 0 10px 30px rgba(90, 65, 40, 0.25);
-  z-index: 2;
-}
-
-/* Image */
-.recorte__img {
+/* Photo image inside */
+.foto__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: sepia(0.15) saturate(0.9);
-  transition: filter var(--duration-fast) ease, transform 0.5s ease;
+  border-radius: 1px;
+  filter: sepia(0.12) saturate(0.85) contrast(0.95);
+  transition: filter var(--duration-fast) ease;
 }
 
-.recorte:hover .recorte__img {
-  filter: sepia(0.05) saturate(1);
-  transform: scale(1.04);
+.foto:hover .foto__img {
+  filter: sepia(0.05) saturate(1) contrast(1);
 }
 
-/* Caption */
-.recorte__caption {
+/* Small handwritten caption at bottom of polaroid */
+.foto__label {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.6rem 0.8rem;
-  background: linear-gradient(transparent, rgba(255, 252, 245, 0.92));
-  font-family: var(--font-script);
-  font-size: clamp(0.75rem, 2.2vw, 1rem);
-  color: var(--sepia-dark);
+  bottom: 3px;
+  left: 8px;
+  right: 8px;
   text-align: center;
+  font-family: var(--font-script);
+  font-size: 0.55rem;
+  color: var(--sepia);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   pointer-events: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  .recorte__caption {
-    background: linear-gradient(transparent, rgba(42, 36, 25, 0.92));
-  }
+/* === INDIVIDUAL PHOTO POSITIONS & ROTATIONS === */
+/* Desktop: scattered across the desk */
+
+.foto--1 {
+  width: clamp(130px, 18vw, 220px);
+  height: clamp(100px, 13vw, 165px);
+  top: 5%;
+  left: 3%;
+  transform: rotate(-12deg);
 }
 
-/* Aspect ratios */
-.recorte--landscape { aspect-ratio: 4 / 3; }
-.recorte--portrait  { aspect-ratio: 3 / 4; }
-.recorte--pano      { aspect-ratio: 16 / 9; }
+.foto--2 {
+  width: clamp(100px, 13vw, 160px);
+  height: clamp(130px, 17vw, 210px);
+  top: 2%;
+  right: 8%;
+  transform: rotate(8deg);
+}
 
-/* Safari < 15 fallback (no aspect-ratio support) */
-@supports not (aspect-ratio: 1) {
-  .recorte--landscape { padding-top: 75%;     position: relative; }
-  .recorte--portrait  { padding-top: 133.33%; position: relative; }
-  .recorte--pano      { padding-top: 56.25%;  position: relative; }
+.foto--3 {
+  width: clamp(120px, 16vw, 200px);
+  height: clamp(90px, 12vw, 150px);
+  bottom: 18%;
+  left: 5%;
+  transform: rotate(6deg);
+}
 
-  .recorte--landscape .recorte__img,
-  .recorte--portrait  .recorte__img,
-  .recorte--pano      .recorte__img {
-    position: absolute;
-    inset: 0;
-  }
+.foto--4 {
+  width: clamp(95px, 12vw, 150px);
+  height: clamp(125px, 16vw, 200px);
+  bottom: 5%;
+  left: 25%;
+  transform: rotate(-4deg);
+}
+
+.foto--5 {
+  width: clamp(160px, 22vw, 280px);
+  height: clamp(90px, 12vw, 158px);
+  bottom: 4%;
+  right: 3%;
+  transform: rotate(-7deg);
+}
+
+.foto--6 {
+  width: clamp(125px, 15vw, 195px);
+  height: clamp(95px, 12vw, 148px);
+  top: 12%;
+  left: 28%;
+  transform: rotate(15deg);
 }
 
 /* ========== BUTTON — Empezar ========== */
@@ -161,11 +163,11 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 1rem 2.8rem;
+  padding: 1rem 3rem;
   font-family: var(--font-display);
-  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-size: clamp(1rem, 3vw, 1.3rem);
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--cream);
   background: linear-gradient(135deg, var(--sepia-dark), var(--sepia));
@@ -177,8 +179,12 @@
   transition:
     transform var(--duration-fast) ease,
     box-shadow var(--duration-fast) ease,
-    background var(--duration-fast) ease;
-  box-shadow: 0 4px 18px var(--shadow-heavy);
+    background var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(201, 169, 78, 0.3);
+  text-decoration: none;
 
   /* iOS compatibility */
   -webkit-tap-highlight-color: transparent;
@@ -205,15 +211,15 @@
 
 .btn-empezar:hover,
 .btn-empezar:focus-visible {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 28px var(--shadow-heavy);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   color: var(--sepia-dark);
   background: linear-gradient(135deg, var(--gold-light), var(--gold));
 }
 
 .btn-empezar:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: 0 2px 10px var(--shadow);
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .btn-empezar__arrow {
@@ -222,11 +228,5 @@
 }
 
 .btn-empezar:hover .btn-empezar__arrow {
-  transform: translateX(5px);
-}
-
-@media (prefers-color-scheme: dark) {
-  .btn-empezar {
-    color: var(--cream-dark);
-  }
+  transform: translateX(6px);
 }

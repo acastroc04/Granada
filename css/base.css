@@ -1,22 +1,101 @@
 /* ============================================
-   BASE — Tipografía, body, textura de papel
+   BASE — Tipografía, body, textura de mesa
    ============================================ */
 
 body {
   font-family: var(--font-body);
   font-weight: 400;
-  color: var(--ink);
-  background-color: var(--cream);
+  color: var(--cream);
+  overflow: hidden;
+
+  /* === WOOD DESK BACKGROUND === */
+  background-color: var(--wood-base);
+  background-image:
+    /* Noise / grain for realism */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E"),
+    /* Wood grain horizontal streaks */
+    repeating-linear-gradient(
+      2deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.03) 3px,
+      rgba(0, 0, 0, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      178deg,
+      transparent,
+      transparent 7px,
+      rgba(120, 85, 50, 0.06) 7px,
+      rgba(120, 85, 50, 0.06) 8px
+    ),
+    /* Wide grain bands */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 40px,
+      rgba(0, 0, 0, 0.04) 40px,
+      rgba(0, 0, 0, 0.04) 42px,
+      transparent 42px,
+      transparent 80px
+    ),
+    /* Warm radial light from center-top (lamp) */
+    radial-gradient(
+      ellipse 80% 60% at 50% 30%,
+      rgba(160, 110, 60, 0.18),
+      transparent
+    ),
+    /* Corner darkening (vignette) */
+    radial-gradient(
+      ellipse at center,
+      transparent 40%,
+      rgba(0, 0, 0, 0.35) 100%
+    ),
+    /* Base wood color gradient */
+    linear-gradient(
+      160deg,
+      var(--wood-light) 0%,
+      var(--wood-base) 30%,
+      var(--wood-dark) 70%,
+      var(--wood-base) 100%
+    );
 }
 
-/* Textura de papel sutil sobre toda la página */
+/* Extra scratches & coffee rings via pseudo-elements */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background:
+    /* Coffee ring stain */
+    radial-gradient(circle 45px at 82% 75%, rgba(80, 50, 20, 0.12) 0%, rgba(80, 50, 20, 0.08) 40%, transparent 60%),
+    radial-gradient(circle 35px at 15% 20%, rgba(80, 50, 20, 0.08) 0%, rgba(80, 50, 20, 0.05) 45%, transparent 55%),
+    /* Subtle scratch marks */
+    linear-gradient(32deg, transparent 48%, rgba(255,255,255,0.02) 49%, rgba(255,255,255,0.02) 49.5%, transparent 50%),
+    linear-gradient(155deg, transparent 45%, rgba(255,255,255,0.015) 46%, rgba(255,255,255,0.015) 46.5%, transparent 47%),
+    linear-gradient(78deg, transparent 30%, rgba(255,255,255,0.02) 30.5%, rgba(255,255,255,0.02) 31%, transparent 31.5%);
   pointer-events: none;
-  z-index: 9999;
+  z-index: 0;
+}
+
+/* Second pseudo for paper/parchment texture under center content */
+body::after {
+  content: '';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-1deg);
+  width: min(420px, 80vw);
+  height: min(280px, 50vh);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"),
+    linear-gradient(135deg, #f5eedf, #ede4d3, #e8dcc8);
+  border-radius: 2px;
+  box-shadow:
+    0 2px 15px rgba(0,0,0,0.3),
+    0 0 1px rgba(0,0,0,0.2),
+    inset 0 0 30px rgba(0,0,0,0.05);
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* Heading hierarchy */
@@ -24,30 +103,11 @@ h1, h2, h3, h4 {
   font-family: var(--font-display);
   font-weight: 700;
   line-height: 1.15;
-  color: var(--sepia-dark);
 }
-
-h1 { font-size: clamp(2.6rem, 8vw, 5.2rem); }
-h2 { font-size: clamp(1.6rem, 5vw, 2.8rem); }
-h3 { font-size: clamp(1.2rem, 3.5vw, 1.8rem); }
 
 p {
   font-family: var(--font-body);
   line-height: 1.65;
-}
-
-/* Script / handwriting utility */
-.text-script {
-  font-family: var(--font-script);
-}
-
-/* Decorative horizontal line */
-.hr-vintage {
-  width: min(280px, 70%);
-  height: 2px;
-  border: none;
-  margin: var(--space-md) auto;
-  background: linear-gradient(90deg, transparent, var(--sepia-light), transparent);
 }
 
 /* Selection color */

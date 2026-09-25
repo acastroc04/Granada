@@ -4,12 +4,10 @@
  */
 
 import { initLoader } from './loader.js';
-import { initScrollAnimations, initRevealOnScroll, initParallax } from './animations.js';
+import { initMouseParallax, initGyroParallax } from './animations.js';
 
-// Inicializar todo al cargar el DOM
 document.addEventListener('DOMContentLoaded', () => {
   initLoader();
-  initScrollAnimations();
-  initRevealOnScroll();
-  initParallax();
+  initMouseParallax();
+  initGyroParallax();
 });
