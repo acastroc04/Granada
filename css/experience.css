@@ -1,0 +1,290 @@
+/* ============================================
+   EXPERIENCE — Brújula nazarí hacia la Alhambra
+   ============================================ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.has-experience::after {
+  opacity: 0;
+}
+
+/* The photographs fold into the centre before the next view appears. */
+.is-transitioning .foto {
+  animation: gatherPhoto 0.75s var(--ease-smooth) forwards !important;
+}
+
+.is-transitioning .centro {
+  animation: fadeScaleOut 0.55s 0.2s ease forwards;
+}
+
+@keyframes gatherPhoto {
+  to {
+    opacity: 0;
+    transform: translate(calc(50vw - 50%), calc(50vh - 50%)) rotate(0) scale(0.08);
+  }
+}
+
+@keyframes fadeScaleOut {
+  to { opacity: 0; transform: scale(0.88); }
+}
+
+.experience {
+  position: relative;
+  z-index: 20;
+  width: 100vw;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(4.5rem, 9vh, 6rem) 1.25rem 2rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  text-align: center;
+  opacity: 0;
+  transform: scale(1.03);
+  transition: opacity 0.7s ease, transform 0.7s var(--ease-smooth);
+}
+
+.experience.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.experience::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(201, 169, 78, 0.14), transparent 38%),
+    repeating-conic-gradient(from 45deg at 50% 50%, rgba(201,169,78,.025) 0 10deg, transparent 10deg 20deg);
+  pointer-events: none;
+}
+
+.experience__back {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  left: max(1rem, env(safe-area-inset-left));
+  padding: 0.65rem 1rem;
+  border: 1px solid rgba(230, 210, 142, 0.55);
+  border-radius: 999px;
+  background: rgba(42, 28, 16, 0.72);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+
+.experience__back:hover,
+.experience__back:focus-visible {
+  background: var(--gold);
+  color: var(--wood-dark);
+}
+
+.experience__header {
+  max-width: 620px;
+  margin: 0 auto 1.25rem;
+}
+
+.experience__eyebrow {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--gold-light);
+  font-family: var(--font-script);
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+}
+
+.experience__title {
+  color: var(--cream);
+  font-size: clamp(2rem, 7vw, 3.6rem);
+  letter-spacing: 0.04em;
+  text-shadow: 0 3px 15px rgba(0, 0, 0, 0.45);
+}
+
+.experience__intro {
+  margin-top: 0.35rem;
+  color: var(--sepia-light);
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+}
+
+.compass-card {
+  width: min(92vw, 460px);
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 1.6rem);
+  border: 1px solid rgba(230, 210, 142, 0.24);
+  border-radius: 24px;
+  background: rgba(42, 28, 16, 0.46);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+}
+
+.compass {
+  width: min(72vw, 330px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  filter: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.42));
+}
+
+.compass__wood-ring {
+  width: 100%;
+  height: 100%;
+  padding: 7%;
+  border: 3px solid #26170c;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle, transparent 0 5px, rgba(255,255,255,.025) 6px, transparent 7px),
+    conic-gradient(from 25deg, #3b2412, #79502b, #3e2614, #8a6034, #34200f, #6b4525, #3b2412);
+  box-shadow:
+    inset 0 0 14px rgba(255, 220, 150, 0.2),
+    inset 0 0 0 8px rgba(30, 17, 8, 0.38),
+    0 0 0 2px #9a6d36;
+}
+
+.compass__metal-ring {
+  width: 100%;
+  height: 100%;
+  padding: 5%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #80652c, #e3c875 40%, #6f521f 72%, #c6a550);
+  box-shadow: inset 0 0 8px #2d1b0c;
+}
+
+.compass__dial {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 2px solid #4e391d;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(from -1deg, #725d39 0 1deg, transparent 1deg 10deg),
+    radial-gradient(circle, transparent 0 63%, rgba(98, 68, 32, .22) 63% 64%, transparent 64%),
+    radial-gradient(circle, #f4e7c5, #d7bd87 68%, #9b743e);
+  box-shadow: inset 0 0 28px rgba(55, 32, 12, 0.5);
+}
+
+.compass__direction {
+  position: absolute;
+  z-index: 4;
+  color: #503719;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 5vw, 1.45rem);
+  font-weight: 900;
+}
+
+.compass__direction--n { top: 5%; left: 50%; transform: translateX(-50%); color: #8c271f; }
+.compass__direction--e { right: 7%; top: 50%; transform: translateY(-50%); }
+.compass__direction--s { bottom: 5%; left: 50%; transform: translateX(-50%); }
+.compass__direction--w { left: 7%; top: 50%; transform: translateY(-50%); }
+
+.compass__rose {
+  position: absolute;
+  inset: 20%;
+  opacity: 0.25;
+  background: conic-gradient(from 45deg, #65451f 0 12.5%, transparent 12.5% 25%, #65451f 25% 37.5%, transparent 37.5% 50%, #65451f 50% 62.5%, transparent 62.5% 75%, #65451f 75% 87.5%, transparent 87.5%);
+  clip-path: polygon(50% 0, 59% 39%, 100% 50%, 59% 61%, 50% 100%, 41% 61%, 0 50%, 41% 39%);
+}
+
+.compass__needle {
+  --needle-angle: 0deg;
+  position: absolute;
+  z-index: 5;
+  top: 18%;
+  bottom: 18%;
+  left: calc(50% - 8px);
+  width: 16px;
+  transform: rotate(var(--needle-angle));
+  transition: transform 0.65s cubic-bezier(.22,.8,.3,1);
+}
+
+.compass__needle-tip,
+.compass__needle-tail {
+  position: absolute;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+}
+
+.compass__needle-tip {
+  top: 0;
+  border-bottom: calc(min(72vw, 330px) * 0.32) solid #9d2d22;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.3));
+}
+
+.compass__needle-tail {
+  bottom: 0;
+  border-top: calc(min(72vw, 330px) * 0.32) solid #4b402e;
+}
+
+.compass__pin {
+  position: absolute;
+  z-index: 6;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  border: 3px solid #6f4b1e;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f8e7a4, #a47c2e 60%, #463016);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 5px rgba(0,0,0,.5);
+}
+
+.compass-card__information {
+  min-height: 5.3rem;
+  margin-top: 1rem;
+}
+
+.compass-card__status {
+  color: var(--sepia-light);
+  font-size: 0.95rem;
+}
+
+.compass-card__distance {
+  color: var(--gold-light);
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 5vw, 1.8rem);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.compass-card__bearing {
+  color: var(--cream-dark);
+  font-size: 0.9rem;
+}
+
+.experience__privacy {
+  margin: 0.85rem auto 0;
+  color: var(--sepia-light);
+  font-size: 0.78rem;
+}
+
+@media (max-height: 700px) {
+  .experience { padding-top: 3.8rem; }
+  .experience__header { margin-bottom: 0.6rem; }
+  .experience__intro { display: none; }
+  .compass { width: min(54vh, 290px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-transitioning .foto,
+  .is-transitioning .centro {
+    animation: none !important;
+    opacity: 0;
+  }
+}

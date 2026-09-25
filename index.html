@@ -72,7 +72,7 @@
     <div class="centro">
       <span class="centro__ornament anim-ornament">✦ ✦ ✦</span>
       <h1 class="centro__title anim-title">Granada</h1>
-      <p class="centro__subtitle anim-subtitle">Recuerdos de Andalucía</p>
+      <p class="centro__subtitle anim-subtitle">Viaje inolvidable</p>
       <div class="centro__line anim-line" aria-hidden="true"></div>
       <p class="centro__quote anim-quote">
         Con mucho amor y cariño, de tu novio Alejandro, espero que te guste.
@@ -83,6 +83,50 @@
       </a>
     </div>
 
+  </main>
+
+  <!-- ==================== BRÚJULA HACIA LA ALHAMBRA ==================== -->
+  <main class="experience" id="experience" hidden>
+    <button class="experience__back" id="btn-volver" type="button" aria-label="Volver a la portada">
+      <span aria-hidden="true">←</span> Volver
+    </button>
+
+    <header class="experience__header">
+      <span class="experience__eyebrow">Tu próximo destino</span>
+      <h2 class="experience__title">Rumbo a la Alhambra</h2>
+      <p class="experience__intro">Sigue la aguja dorada y deja que Granada te guíe.</p>
+    </header>
+
+    <section class="compass-card" aria-labelledby="compass-title">
+      <h3 class="sr-only" id="compass-title">Brújula hacia la Alhambra</h3>
+
+      <div class="compass" id="compass" aria-hidden="true">
+        <div class="compass__wood-ring">
+          <div class="compass__metal-ring">
+            <div class="compass__dial">
+              <span class="compass__direction compass__direction--n">N</span>
+              <span class="compass__direction compass__direction--e">E</span>
+              <span class="compass__direction compass__direction--s">S</span>
+              <span class="compass__direction compass__direction--w">O</span>
+              <div class="compass__rose"></div>
+              <div class="compass__needle" id="compass-needle">
+                <span class="compass__needle-tip"></span>
+                <span class="compass__needle-tail"></span>
+              </div>
+              <div class="compass__pin"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="compass-card__information" aria-live="polite">
+        <p class="compass-card__status" id="location-status">Preparando la brújula…</p>
+        <p class="compass-card__distance" id="location-distance">—</p>
+        <p class="compass-card__bearing" id="location-bearing"></p>
+      </div>
+    </section>
+
+    <p class="experience__privacy">Tu ubicación sólo se usa en este dispositivo y no se guarda.</p>
   </main>
 
   <!-- Scripts -->

@@ -79,8 +79,8 @@
 .centro__quote {
   font-family: var(--font-body);
   font-style: italic;
-  font-weight: 300;
-  font-size: clamp(0.8rem, 2.2vw, 1rem);
+  font-weight: 700;
+  font-size: clamp(1rem, 2.6vw, 1.2rem);
   color: var(--sepia);
   max-width: 360px;
   line-height: 1.5;
