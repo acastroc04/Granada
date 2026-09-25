@@ -1,0 +1,53 @@
+/* ============================================
+   DESIGN TOKENS — Granada Vintage
+   Paleta pastel suave · tipografías · espaciado
+   ============================================ */
+
+:root {
+  /* — Colors — */
+  --cream:          #faf6f0;
+  --cream-dark:     #f0e8db;
+  --parchment:      #ede4d3;
+  --sepia:          #8b7355;
+  --sepia-light:    #b8a48a;
+  --sepia-dark:     #5c4a32;
+  --rose-pastel:    #e8c4c4;
+  --blue-pastel:    #c4d4e8;
+  --green-pastel:   #c4d9c4;
+  --gold:           #c9a94e;
+  --gold-light:     #e6d28e;
+  --ink:            #3a2e22;
+  --shadow:         rgba(90, 65, 40, 0.18);
+  --shadow-heavy:   rgba(90, 65, 40, 0.30);
+
+  /* — Wood desk — */
+  --wood-base:      #3d2b1a;
+  --wood-light:     #5a3d25;
+  --wood-dark:      #2a1c10;
+  --wood-grain:     #4a3420;
+  --wood-highlight: rgba(120, 85, 50, 0.15);
+
+  /* — Typography — */
+  --font-display:   'Playfair Display', Georgia, serif;
+  --font-body:      'Cormorant Garamond', 'Times New Roman', serif;
+  --font-script:    'Dancing Script', cursive;
+
+  /* — Spacing — */
+  --space-xs:   0.4rem;
+  --space-sm:   0.8rem;
+  --space-md:   1.2rem;
+  --space-lg:   2rem;
+  --space-xl:   3rem;
+  --space-2xl:  4rem;
+
+  /* — Border Radius — */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  50px;
+
+  /* — Transitions — */
+  --ease-smooth:  cubic-bezier(.25, .8, .25, 1);
+  --duration-fast: 0.3s;
+  --duration-med:  0.45s;
+  --duration-slow: 0.8s;
+}

@@ -1,0 +1,62 @@
+/* ============================================
+   BASE — Tipografía, body, textura de papel
+   ============================================ */
+
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: var(--ink);
+  background-color: var(--cream);
+}
+
+/* Textura de papel sutil sobre toda la página */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Heading hierarchy */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--sepia-dark);
+}
+
+h1 { font-size: clamp(2.6rem, 8vw, 5.2rem); }
+h2 { font-size: clamp(1.6rem, 5vw, 2.8rem); }
+h3 { font-size: clamp(1.2rem, 3.5vw, 1.8rem); }
+
+p {
+  font-family: var(--font-body);
+  line-height: 1.65;
+}
+
+/* Script / handwriting utility */
+.text-script {
+  font-family: var(--font-script);
+}
+
+/* Decorative horizontal line */
+.hr-vintage {
+  width: min(280px, 70%);
+  height: 2px;
+  border: none;
+  margin: var(--space-md) auto;
+  background: linear-gradient(90deg, transparent, var(--sepia-light), transparent);
+}
+
+/* Selection color */
+::selection {
+  background: var(--gold-light);
+  color: var(--sepia-dark);
+}
+
+::-moz-selection {
+  background: var(--gold-light);
+  color: var(--sepia-dark);
+}

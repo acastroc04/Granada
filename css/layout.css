@@ -1,0 +1,128 @@
+/* ============================================
+   LAYOUT — Contenedores, grid del collage,
+   estructura principal de la landing
+   ============================================ */
+
+/* ---------- Landing wrapper ---------- */
+.landing {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* iOS Safe Area support */
+@supports (padding: env(safe-area-inset-top)) {
+  .landing {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* ---------- Top decorative border ---------- */
+.vintage-border-top {
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, transparent, var(--gold-light) 20%, var(--gold) 50%, var(--gold-light) 80%, transparent);
+  flex-shrink: 0;
+}
+
+/* ---------- Header ---------- */
+.header {
+  text-align: center;
+  padding: var(--space-xl) 1.5rem var(--space-md);
+  position: relative;
+  width: 100%;
+}
+
+.header__ornament {
+  display: block;
+  margin: 0 auto var(--space-sm);
+  font-size: 1.6rem;
+  color: var(--gold);
+  letter-spacing: 0.4em;
+}
+
+.header__title {
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.header__subtitle {
+  font-family: var(--font-script);
+  font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+  color: var(--sepia);
+  margin-top: var(--space-xs);
+  font-weight: 400;
+}
+
+.header__line {
+  width: min(280px, 70%);
+  height: 2px;
+  margin: var(--space-md) auto 0;
+  background: linear-gradient(90deg, transparent, var(--sepia-light), transparent);
+}
+
+/* ---------- Collage Grid ---------- */
+.collage {
+  width: 100%;
+  max-width: var(--max-width);
+  padding: var(--space-md) var(--space-md) 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: auto;
+  gap: var(--grid-gap);
+}
+
+/* Wide items span 2 columns */
+.recorte--wide {
+  grid-column: span 2;
+}
+
+/* ---------- CTA Section ---------- */
+.cta-section {
+  text-align: center;
+  padding: var(--space-xl) 1.5rem var(--space-xl);
+  width: 100%;
+  max-width: 600px;
+}
+
+.cta-quote {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 2.8vw, 1.25rem);
+  color: var(--sepia);
+  margin-bottom: var(--space-lg);
+  line-height: 1.6;
+}
+
+.cta-quote::before { content: '« '; }
+.cta-quote::after  { content: ' »'; }
+
+/* ---------- Footer ornament ---------- */
+.footer-ornament {
+  width: 100%;
+  text-align: center;
+  padding: var(--space-sm) 0 var(--space-lg);
+}
+
+.footer-ornament__line {
+  width: min(200px, 50%);
+  height: 1px;
+  margin: 0 auto var(--space-sm);
+  background: linear-gradient(90deg, transparent, var(--sepia-light), transparent);
+}
+
+.footer-ornament__text {
+  font-family: var(--font-script);
+  font-size: 0.85rem;
+  color: var(--sepia-light);
+  letter-spacing: 0.08em;
+}

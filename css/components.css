@@ -1,0 +1,232 @@
+/* ============================================
+   COMPONENTS — Elementos reutilizables
+   Recortes, botones, loader
+   ============================================ */
+
+/* ========== LOADER ========== */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: var(--cream);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--duration-slow) ease, visibility var(--duration-slow) ease;
+}
+
+.loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader__spinner {
+  width: 60px;
+  height: 60px;
+  border: 3px solid var(--sepia-light);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loader__text {
+  margin-top: var(--space-md);
+  font-family: var(--font-script);
+  font-size: 1.4rem;
+  color: var(--sepia);
+  letter-spacing: 0.05em;
+}
+
+/* ========== RECORTE (Photo Clipping) ========== */
+.recorte {
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #fff;
+  box-shadow:
+    0 4px 16px var(--shadow),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  transition:
+    transform var(--duration-med) var(--ease-smooth),
+    box-shadow var(--duration-fast) ease;
+  cursor: default;
+}
+
+/* Dark mode card bg */
+@media (prefers-color-scheme: dark) {
+  .recorte { background: var(--parchment); }
+}
+
+/* Tape strip decoration */
+.recorte::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 60px;
+  height: 20px;
+  background: rgba(232, 218, 190, 0.7);
+  border-radius: 2px;
+  z-index: 3;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.recorte:nth-child(even)::before {
+  transform: translateX(-50%) rotate(3deg);
+  background: rgba(200, 218, 230, 0.65);
+}
+
+.recorte:nth-child(3n)::before {
+  background: rgba(220, 200, 200, 0.65);
+}
+
+/* Slight random rotations via custom property */
+.recorte:nth-child(1) { --rot: -2.2deg; }
+.recorte:nth-child(2) { --rot:  1.5deg; }
+.recorte:nth-child(3) { --rot: -1deg;   }
+.recorte:nth-child(4) { --rot:  2.5deg; }
+.recorte:nth-child(5) { --rot: -1.8deg; }
+.recorte:nth-child(6) { --rot:  1deg;   }
+
+.recorte {
+  transform: rotate(var(--rot, 0deg));
+}
+
+/* Hover lift & straighten */
+.recorte:hover {
+  transform: rotate(0deg) scale(1.03);
+  box-shadow: 0 10px 30px rgba(90, 65, 40, 0.25);
+  z-index: 2;
+}
+
+/* Image */
+.recorte__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: sepia(0.15) saturate(0.9);
+  transition: filter var(--duration-fast) ease, transform 0.5s ease;
+}
+
+.recorte:hover .recorte__img {
+  filter: sepia(0.05) saturate(1);
+  transform: scale(1.04);
+}
+
+/* Caption */
+.recorte__caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.6rem 0.8rem;
+  background: linear-gradient(transparent, rgba(255, 252, 245, 0.92));
+  font-family: var(--font-script);
+  font-size: clamp(0.75rem, 2.2vw, 1rem);
+  color: var(--sepia-dark);
+  text-align: center;
+  pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .recorte__caption {
+    background: linear-gradient(transparent, rgba(42, 36, 25, 0.92));
+  }
+}
+
+/* Aspect ratios */
+.recorte--landscape { aspect-ratio: 4 / 3; }
+.recorte--portrait  { aspect-ratio: 3 / 4; }
+.recorte--pano      { aspect-ratio: 16 / 9; }
+
+/* Safari < 15 fallback (no aspect-ratio support) */
+@supports not (aspect-ratio: 1) {
+  .recorte--landscape { padding-top: 75%;     position: relative; }
+  .recorte--portrait  { padding-top: 133.33%; position: relative; }
+  .recorte--pano      { padding-top: 56.25%;  position: relative; }
+
+  .recorte--landscape .recorte__img,
+  .recorte--portrait  .recorte__img,
+  .recorte--pano      .recorte__img {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+/* ========== BUTTON — Empezar ========== */
+.btn-empezar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 2.8rem;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cream);
+  background: linear-gradient(135deg, var(--sepia-dark), var(--sepia));
+  border: 2px solid var(--gold);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease,
+    background var(--duration-fast) ease;
+  box-shadow: 0 4px 18px var(--shadow-heavy);
+
+  /* iOS compatibility */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: manipulation;
+}
+
+.btn-empezar::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity var(--duration-fast) ease;
+}
+
+.btn-empezar:hover::before,
+.btn-empezar:focus-visible::before {
+  opacity: 1;
+}
+
+.btn-empezar:hover,
+.btn-empezar:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px var(--shadow-heavy);
+  color: var(--sepia-dark);
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+}
+
+.btn-empezar:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 10px var(--shadow);
+}
+
+.btn-empezar__arrow {
+  display: inline-block;
+  transition: transform var(--duration-fast) ease;
+}
+
+.btn-empezar:hover .btn-empezar__arrow {
+  transform: translateX(5px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn-empezar {
+    color: var(--cream-dark);
+  }
+}

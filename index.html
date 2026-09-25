@@ -14,19 +14,20 @@
   <!-- Preconnect Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
+  <!-- Styles (single entry point) -->
+  <link rel="stylesheet" href="css/main.css">
 
-  <!-- Favicon: pomegranate emoji as SVG -->
+  <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏰</text></svg>">
 </head>
 <body>
 
   <!-- ==================== LOADER ==================== -->
-  <div id="loader" aria-hidden="true">
-    <div class="loader-ornament"></div>
-    <span class="loader-text">Preparando tu viaje…</span>
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__spinner"></div>
+    <span class="loader__text">Preparando tu viaje…</span>
   </div>
 
   <!-- ==================== LANDING ==================== -->
@@ -37,16 +38,16 @@
 
     <!-- Header -->
     <header class="header">
-      <span class="header__ornament" aria-hidden="true">✦ ✦ ✦</span>
-      <h1 class="header__title">Granada</h1>
-      <p class="header__subtitle">Recuerdos de Andalucía</p>
-      <div class="header__line" aria-hidden="true"></div>
+      <span class="header__ornament anim-fade-down" aria-hidden="true">✦ ✦ ✦</span>
+      <h1 class="header__title anim-fade-up">Granada</h1>
+      <p class="header__subtitle anim-fade-up-delay">Recuerdos de Andalucía</p>
+      <div class="header__line anim-fade-up-late" aria-hidden="true"></div>
     </header>
 
     <!-- Collage of 6 vintage "recortes" -->
     <section class="collage" aria-label="Recortes vintage de Granada">
 
-      <!-- 1. Alhambra — wide/panoramic -->
+      <!-- 1. Alhambra — wide/landscape -->
       <article class="recorte recorte--wide recorte--landscape">
         <img
           class="recorte__img"
@@ -54,6 +55,7 @@
           alt="La Alhambra de Granada con Sierra Nevada al fondo"
           loading="eager"
           decoding="async"
+          width="800" height="600"
         >
         <span class="recorte__caption">La Alhambra · Joya Nazarí</span>
       </article>
@@ -66,6 +68,7 @@
           alt="Catedral de Granada, arquitectura barroca"
           loading="lazy"
           decoding="async"
+          width="600" height="800"
         >
         <span class="recorte__caption">Catedral de Granada</span>
       </article>
@@ -78,6 +81,7 @@
           alt="Calles del barrio del Albaicín con casas blancas y flores"
           loading="lazy"
           decoding="async"
+          width="800" height="600"
         >
         <span class="recorte__caption">El Albaicín</span>
       </article>
@@ -90,6 +94,7 @@
           alt="Bailaora de flamenco en un patio de Granada"
           loading="lazy"
           decoding="async"
+          width="600" height="800"
         >
         <span class="recorte__caption">Flamenco · Alma Gitana</span>
       </article>
@@ -102,6 +107,7 @@
           alt="Vista de la Alhambra desde el Mirador de San Nicolás al atardecer"
           loading="lazy"
           decoding="async"
+          width="1600" height="900"
         >
         <span class="recorte__caption">Mirador de San Nicolás · Atardecer</span>
       </article>
@@ -114,6 +120,7 @@
           alt="Tapas tradicionales con granadas y vino en una terraza de Granada"
           loading="lazy"
           decoding="async"
+          width="800" height="600"
         >
         <span class="recorte__caption">Tapas & Granadas</span>
       </article>
@@ -121,7 +128,7 @@
     </section>
 
     <!-- CTA -->
-    <section class="cta-section">
+    <section class="cta-section anim-cta">
       <p class="cta-quote">
         Dale limosna, mujer, que no hay en la vida nada como la pena de ser ciego en Granada
       </p>
@@ -132,67 +139,15 @@
     </section>
 
     <!-- Footer ornament -->
-    <footer class="footer-ornament" aria-hidden="true">
+    <footer class="footer-ornament anim-footer" aria-hidden="true">
       <div class="footer-ornament__line"></div>
       <span class="footer-ornament__text">~ Granada, España ~</span>
     </footer>
 
   </main>
 
-  <!-- ==================== SCRIPTS ==================== -->
-  <script>
-    // --- Loader ---
-    window.addEventListener('load', () => {
-      const loader = document.getElementById('loader');
-      // Small delay so animations feel intentional
-      setTimeout(() => {
-        loader.classList.add('hidden');
-        loader.addEventListener('transitionend', () => {
-          loader.style.display = 'none';
-        }, { once: true });
-      }, 800);
-    });
-
-    // --- Intersection Observer for scroll animations ---
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.style.animationPlayState = 'running';
-              observer.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
-      );
-
-      document.querySelectorAll('.recorte').forEach((el) => {
-        el.style.animationPlayState = 'paused';
-        observer.observe(el);
-      });
-    }
-
-    // --- Parallax-lite on desktop for recortes ---
-    if (window.matchMedia('(min-width: 768px)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const recortes = document.querySelectorAll('.recorte');
-      let ticking = false;
-
-      window.addEventListener('scroll', () => {
-        if (!ticking) {
-          window.requestAnimationFrame(() => {
-            const scrollY = window.scrollY;
-            recortes.forEach((el, i) => {
-              const speed = (i % 2 === 0) ? 0.02 : -0.015;
-              el.style.setProperty('--parallax-y', `${scrollY * speed}px`);
-            });
-            ticking = false;
-          });
-          ticking = true;
-        }
-      }, { passive: true });
-    }
-  </script>
+  <!-- Scripts (ES Modules) -->
+  <script type="module" src="js/main.js"></script>
 
 </body>
 </html>
