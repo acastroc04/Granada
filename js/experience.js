@@ -26,6 +26,7 @@ let orientationFrame;
 let completedLocationIds = new Set();
 let hintMap;
 let hintMapLayers;
+let hintMapResizeObserver;
 let lastKnownPosition;
 
 function normaliseDegrees(value) {
@@ -393,7 +394,8 @@ function requestCurrentPosition() {
         };
         reject(new Error(messages[error.code] || 'No se ha podido obtener tu ubicación.'));
       },
-      { enableHighAccuracy: true, maximumAge: 30000, timeout: 8000 }
+      // Pista must always begin from a fresh reading, never from a cached fix.
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
     );
   });
 }
@@ -408,6 +410,13 @@ function initialiseHintMap(latitude, longitude) {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(hintMap);
     hintMapLayers = window.L.layerGroup().addTo(hintMap);
+
+    if ('ResizeObserver' in window) {
+      hintMapResizeObserver = new ResizeObserver(() => {
+        requestAnimationFrame(() => hintMap?.invalidateSize({ animate: false }));
+      });
+      hintMapResizeObserver.observe(document.getElementById('hint-map'));
+    }
   }
 
   hintMapLayers.clearLayers();
@@ -419,14 +428,35 @@ function initialiseHintMap(latitude, longitude) {
 
 function findNextStreet(steps) {
   const currentStreet = (steps[0]?.name || '').trim();
-  const nextStep = steps.slice(1).find((step) => {
+  const nextStepIndex = steps.findIndex((step, index) => {
+    if (index === 0) return false;
     const street = (step.name || '').trim();
     return street && street !== currentStreet;
   });
 
-  if (nextStep) return nextStep.name.trim();
-  const firstNamedStreet = steps.find((step) => (step.name || '').trim());
-  return firstNamedStreet?.name.trim() || '';
+  if (nextStepIndex !== -1) {
+    return { name: steps[nextStepIndex].name.trim(), stepIndex: nextStepIndex };
+  }
+
+  const firstNamedIndex = steps.findIndex((step) => (step.name || '').trim());
+  return firstNamedIndex === -1
+    ? { name: '', stepIndex: steps.length - 1 }
+    : { name: steps[firstNamedIndex].name.trim(), stepIndex: firstNamedIndex };
+}
+
+function getStreetHintCoordinates(route, nextStreet) {
+  const steps = route.legs?.[0]?.steps || [];
+  const coordinates = steps
+    .slice(0, Math.max(1, nextStreet.stepIndex))
+    .flatMap((step) => step.geometry?.coordinates || []);
+  const streetEntry = steps[nextStreet.stepIndex]?.geometry?.coordinates?.[0];
+  if (streetEntry) coordinates.push(streetEntry);
+
+  if (coordinates.length >= 2) {
+    return coordinates.map(([longitude, latitude]) => [latitude, longitude]);
+  }
+
+  return route.geometry.coordinates.map(([longitude, latitude]) => [latitude, longitude]);
 }
 
 async function loadWalkingRoute(origin, destination) {
@@ -460,42 +490,58 @@ async function openHintMap() {
     const destination = locations[currentDestinationIndex];
     if (!destination) throw new Error('Ya has completado todos los destinos de la ruta.');
 
-    const hasRecentPosition = lastKnownPosition
-      && Date.now() - lastKnownPosition.recordedAt < 30000;
-    const origin = hasRecentPosition ? lastKnownPosition : await requestCurrentPosition();
+    // Always request a new fix when Pista is pressed. This makes the next
+    // street advance together with the person instead of reusing an old route.
+    const origin = await requestCurrentPosition();
     initialiseHintMap(origin.latitude, origin.longitude);
     instruction.textContent = 'Buscando el mejor camino a pie…';
 
     const route = await loadWalkingRoute(origin, destination);
-    const routeCoordinates = route.geometry.coordinates.map(([longitude, latitude]) => [latitude, longitude]);
-    const routeLine = window.L.polyline(routeCoordinates, {
-      color: '#9d3b2d',
-      weight: 6,
-      opacity: 0.9,
+    const steps = route.legs?.[0]?.steps || [];
+    const nextStreet = findNextStreet(steps);
+    const routeCoordinates = getStreetHintCoordinates(route, nextStreet);
+
+    window.L.polyline(routeCoordinates, {
+      color: '#fff8df',
+      weight: 11,
+      opacity: 0.95,
       lineCap: 'round',
       lineJoin: 'round',
     }).addTo(hintMapLayers);
 
-    window.L.circleMarker([origin.latitude, origin.longitude], {
-      radius: 8,
-      color: '#fff8df',
-      weight: 3,
-      fillColor: '#2f6d78',
-      fillOpacity: 1,
-    }).bindTooltip('Estás aquí').addTo(hintMapLayers);
+    const routeLine = window.L.polyline(routeCoordinates, {
+      color: '#9d3b2d',
+      weight: 6,
+      opacity: 1,
+      lineCap: 'round',
+      lineJoin: 'round',
+    }).addTo(hintMapLayers);
 
-    window.L.circleMarker([destination.latitude, destination.longitude], {
-      radius: 8,
-      color: '#fff8df',
-      weight: 3,
-      fillColor: '#9d3b2d',
-      fillOpacity: 1,
-    }).bindTooltip('Destino secreto').addTo(hintMapLayers);
+    const userIcon = window.L.divIcon({
+      className: '',
+      html: '<div class="hint-map__user-marker"></div>',
+      iconSize: [22, 22],
+      iconAnchor: [11, 11],
+    });
+    window.L.marker([origin.latitude, origin.longitude], { icon: userIcon, zIndexOffset: 1000 })
+      .bindTooltip('Estás aquí', { permanent: true, direction: 'top', offset: [0, -14] })
+      .addTo(hintMapLayers);
 
-    hintMap.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
-    const nextStreet = findNextStreet(route.legs?.[0]?.steps || []);
-    instruction.textContent = nextStreet
-      ? `Siguiente calle: ${nextStreet}`
+    const streetEntry = routeCoordinates[routeCoordinates.length - 1];
+    const nextIcon = window.L.divIcon({
+      className: '',
+      html: '<div class="hint-map__next-marker"><span>➜</span></div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+    });
+    window.L.marker(streetEntry, { icon: nextIcon, zIndexOffset: 900 })
+      .bindTooltip('Siguiente calle', { direction: 'top', offset: [0, -25] })
+      .addTo(hintMapLayers);
+
+    hintMap.fitBounds(routeLine.getBounds(), { padding: [45, 45], maxZoom: 18 });
+    setTimeout(() => hintMap.invalidateSize({ animate: false }), 100);
+    instruction.textContent = nextStreet.name
+      ? `Siguiente calle: ${nextStreet.name}`
       : 'Sigue el trazado dorado hasta el siguiente giro.';
   } catch (error) {
     instruction.textContent = error.message || 'No se ha podido preparar la pista.';

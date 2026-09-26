@@ -28,7 +28,8 @@ utiliza una sesión privada que no conserve almacenamiento.
 El botón `Pista` muestra un mapa de OpenStreetMap y solicita una ruta peatonal
 al servidor público de FOSSGIS. No necesita clave de API. El nombre del destino
 permanece oculto, pero la ubicación actual y el punto final se envían al
-servicio para poder calcular el recorrido por las calles.
+servicio para poder calcular el recorrido por las calles. Cada pulsación pide
+una ubicación nueva al dispositivo y recalcula desde cero la siguiente calle.
 
 ## Estructura
 
