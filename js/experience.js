@@ -10,6 +10,7 @@ const ORIENTATION_SMOOTHING = 0.22;
 const PROGRESS_STORAGE_KEY = 'granada-route-progress-v1';
 const TO_RADIANS = Math.PI / 180;
 const TO_DEGREES = 180 / Math.PI;
+const GRANADA_CENTRE = { latitude: 37.1773, longitude: -3.5986 };
 
 let locations = [];
 let locationsPromise;
@@ -25,6 +26,7 @@ let orientationFrame;
 let completedLocationIds = new Set();
 let hintMap;
 let hintMapLayers;
+let lastKnownPosition;
 
 function normaliseDegrees(value) {
   return (value + 360) % 360;
@@ -276,6 +278,12 @@ function reachCurrentDestination(currentCoordinates = null) {
 }
 
 function processPosition(coords) {
+  lastKnownPosition = {
+    latitude: coords.latitude,
+    longitude: coords.longitude,
+    recordedAt: Date.now(),
+  };
+
   const destination = locations[currentDestinationIndex];
   if (!destination) return;
 
@@ -369,16 +377,23 @@ function requestCurrentPosition() {
     }
 
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => resolve({ latitude: coords.latitude, longitude: coords.longitude }),
+      ({ coords }) => {
+        lastKnownPosition = {
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          recordedAt: Date.now(),
+        };
+        resolve(lastKnownPosition);
+      },
       (error) => {
         const messages = {
-          1: 'Activa el permiso de ubicación para abrir la pista.',
+          1: 'Activa el permiso de ubicación y comprueba que la web usa HTTPS.',
           2: 'No se ha podido encontrar tu ubicación actual.',
           3: 'La ubicación está tardando demasiado. Inténtalo de nuevo.',
         };
         reject(new Error(messages[error.code] || 'No se ha podido obtener tu ubicación.'));
       },
-      { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
+      { enableHighAccuracy: true, maximumAge: 30000, timeout: 8000 }
     );
   });
 }
@@ -397,7 +412,9 @@ function initialiseHintMap(latitude, longitude) {
 
   hintMapLayers.clearLayers();
   hintMap.setView([latitude, longitude], 16);
-  setTimeout(() => hintMap.invalidateSize(), 0);
+  [0, 150, 400].forEach((delay) => {
+    setTimeout(() => hintMap.invalidateSize({ animate: false }), delay);
+  });
 }
 
 function findNextStreet(steps) {
@@ -436,12 +453,16 @@ async function openHintMap() {
   instruction.textContent = 'Localizando tu posición…';
 
   try {
+    // Render the map immediately; GPS and routing can finish afterwards.
+    initialiseHintMap(GRANADA_CENTRE.latitude, GRANADA_CENTRE.longitude);
     locationsPromise ||= loadLocations();
     await locationsPromise;
     const destination = locations[currentDestinationIndex];
     if (!destination) throw new Error('Ya has completado todos los destinos de la ruta.');
 
-    const origin = await requestCurrentPosition();
+    const hasRecentPosition = lastKnownPosition
+      && Date.now() - lastKnownPosition.recordedAt < 30000;
+    const origin = hasRecentPosition ? lastKnownPosition : await requestCurrentPosition();
     initialiseHintMap(origin.latitude, origin.longitude);
     instruction.textContent = 'Buscando el mejor camino a pie…';
 

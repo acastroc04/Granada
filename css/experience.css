@@ -415,11 +415,19 @@
 
 .hint-map {
   width: 100%;
-  height: min(58vh, 480px);
+  height: clamp(320px, 58dvh, 480px);
+  flex: 0 0 auto;
   min-height: 300px;
   border: 2px solid rgba(92,74,50,.55);
   border-radius: 12px;
   background: #d8c9a7;
+}
+
+.hint-map .leaflet-tile,
+.hint-map .leaflet-marker-icon,
+.hint-map .leaflet-marker-shadow {
+  max-width: none !important;
+  max-height: none !important;
 }
 
 .hint-modal__note {
@@ -451,9 +459,9 @@
   }
 
   .hint-map {
-    flex: 1;
-    height: auto;
-    min-height: 260px;
+    flex: 1 1 auto;
+    height: 55dvh;
+    min-height: 240px;
   }
 }
 
