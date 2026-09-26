@@ -25,6 +25,11 @@ cada navegador y dispositivo, persiste después de recargar la página y no se
 envía a ningún servidor. Se pierde si el usuario borra los datos del sitio o
 utiliza una sesión privada que no conserve almacenamiento.
 
+El botón `Pista` muestra un mapa de OpenStreetMap y solicita una ruta peatonal
+al servidor público de FOSSGIS. No necesita clave de API. El nombre del destino
+permanece oculto, pero la ubicación actual y el punto final se envían al
+servicio para poder calcular el recorrido por las calles.
+
 ## Estructura
 
 - `index.html`: portada y contenido principal.

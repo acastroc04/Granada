@@ -23,6 +23,8 @@ let smoothedHeading = null;
 let needleRotation = 0;
 let orientationFrame;
 let completedLocationIds = new Set();
+let hintMap;
+let hintMapLayers;
 
 function normaliseDegrees(value) {
   return (value + 360) % 360;
@@ -263,7 +265,7 @@ function reachCurrentDestination(currentCoordinates = null) {
       currentCoordinates.longitude,
       nextDestination
     );
-    document.getElementById('location-bearing').textContent = `Rumbo ${Math.round(destinationBearing)}°`;
+    document.getElementById('location-bearing').textContent = '';
     rotateNeedle();
   } else {
     document.getElementById('location-bearing').textContent = 'Calculando el nuevo rumbo…';
@@ -286,7 +288,7 @@ function processPosition(coords) {
 
   destinationBearing = calculateBearing(coords.latitude, coords.longitude, destination);
   document.getElementById('location-distance').textContent = formatDistance(distanceMetres);
-  document.getElementById('location-bearing').textContent = `Rumbo ${Math.round(destinationBearing)}°`;
+  document.getElementById('location-bearing').textContent = '';
   document.getElementById('location-status').textContent = smoothedHeading === null
     ? 'Ubicación actualizada · orienta el norte hacia arriba'
     : 'Ubicación y orientación actualizadas';
@@ -359,14 +361,154 @@ function stopLocationUpdates() {
   locationRequestInProgress = false;
 }
 
+function requestCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Este navegador no permite obtener tu ubicación.'));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => resolve({ latitude: coords.latitude, longitude: coords.longitude }),
+      (error) => {
+        const messages = {
+          1: 'Activa el permiso de ubicación para abrir la pista.',
+          2: 'No se ha podido encontrar tu ubicación actual.',
+          3: 'La ubicación está tardando demasiado. Inténtalo de nuevo.',
+        };
+        reject(new Error(messages[error.code] || 'No se ha podido obtener tu ubicación.'));
+      },
+      { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
+    );
+  });
+}
+
+function initialiseHintMap(latitude, longitude) {
+  if (!window.L) throw new Error('No se ha podido cargar el mapa. Comprueba tu conexión.');
+
+  if (!hintMap) {
+    hintMap = window.L.map('hint-map', { zoomControl: true }).setView([latitude, longitude], 16);
+    window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(hintMap);
+    hintMapLayers = window.L.layerGroup().addTo(hintMap);
+  }
+
+  hintMapLayers.clearLayers();
+  hintMap.setView([latitude, longitude], 16);
+  setTimeout(() => hintMap.invalidateSize(), 0);
+}
+
+function findNextStreet(steps) {
+  const currentStreet = (steps[0]?.name || '').trim();
+  const nextStep = steps.slice(1).find((step) => {
+    const street = (step.name || '').trim();
+    return street && street !== currentStreet;
+  });
+
+  if (nextStep) return nextStep.name.trim();
+  const firstNamedStreet = steps.find((step) => (step.name || '').trim());
+  return firstNamedStreet?.name.trim() || '';
+}
+
+async function loadWalkingRoute(origin, destination) {
+  const coordinates = `${origin.longitude},${origin.latitude};${destination.longitude},${destination.latitude}`;
+  const endpoint = `https://routing.openstreetmap.de/routed-foot/route/v1/driving/${coordinates}`
+    + '?overview=full&geometries=geojson&steps=true';
+  const response = await fetch(endpoint, { headers: { Accept: 'application/json' } });
+
+  if (!response.ok) throw new Error('El servicio de rutas no está disponible ahora mismo.');
+  const data = await response.json();
+  if (data.code !== 'Ok' || !data.routes?.length) {
+    throw new Error('No se ha encontrado un camino a pie hasta la siguiente pista.');
+  }
+
+  return data.routes[0];
+}
+
+async function openHintMap() {
+  const modal = document.getElementById('hint-modal');
+  const instruction = document.getElementById('hint-map-instruction');
+  const hintButton = document.getElementById('hint-button');
+  modal.hidden = false;
+  hintButton.disabled = true;
+  instruction.textContent = 'Localizando tu posición…';
+
+  try {
+    locationsPromise ||= loadLocations();
+    await locationsPromise;
+    const destination = locations[currentDestinationIndex];
+    if (!destination) throw new Error('Ya has completado todos los destinos de la ruta.');
+
+    const origin = await requestCurrentPosition();
+    initialiseHintMap(origin.latitude, origin.longitude);
+    instruction.textContent = 'Buscando el mejor camino a pie…';
+
+    const route = await loadWalkingRoute(origin, destination);
+    const routeCoordinates = route.geometry.coordinates.map(([longitude, latitude]) => [latitude, longitude]);
+    const routeLine = window.L.polyline(routeCoordinates, {
+      color: '#9d3b2d',
+      weight: 6,
+      opacity: 0.9,
+      lineCap: 'round',
+      lineJoin: 'round',
+    }).addTo(hintMapLayers);
+
+    window.L.circleMarker([origin.latitude, origin.longitude], {
+      radius: 8,
+      color: '#fff8df',
+      weight: 3,
+      fillColor: '#2f6d78',
+      fillOpacity: 1,
+    }).bindTooltip('Estás aquí').addTo(hintMapLayers);
+
+    window.L.circleMarker([destination.latitude, destination.longitude], {
+      radius: 8,
+      color: '#fff8df',
+      weight: 3,
+      fillColor: '#9d3b2d',
+      fillOpacity: 1,
+    }).bindTooltip('Destino secreto').addTo(hintMapLayers);
+
+    hintMap.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+    const nextStreet = findNextStreet(route.legs?.[0]?.steps || []);
+    instruction.textContent = nextStreet
+      ? `Siguiente calle: ${nextStreet}`
+      : 'Sigue el trazado dorado hasta el siguiente giro.';
+  } catch (error) {
+    instruction.textContent = error.message || 'No se ha podido preparar la pista.';
+  } finally {
+    hintButton.disabled = false;
+  }
+}
+
+function closeHintMap() {
+  document.getElementById('hint-modal').hidden = true;
+  document.getElementById('hint-button').focus();
+}
+
 export function initExperience() {
   const startButton = document.getElementById('btn-empezar');
   const backButton = document.getElementById('btn-volver');
   const landing = document.getElementById('landing');
   const experience = document.getElementById('experience');
   const testArrivalButton = document.getElementById('test-arrival-button');
+  const hintButton = document.getElementById('hint-button');
+  const hintModal = document.getElementById('hint-modal');
+  const hintModalClose = document.getElementById('hint-modal-close');
 
-  if (!startButton || !backButton || !landing || !experience || !testArrivalButton) return;
+  if (!startButton || !backButton || !landing || !experience || !testArrivalButton
+      || !hintButton || !hintModal || !hintModalClose) return;
+
+  hintButton.addEventListener('click', openHintMap);
+  hintModalClose.addEventListener('click', closeHintMap);
+  hintModal.addEventListener('click', (event) => {
+    if (event.target === hintModal) closeHintMap();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !hintModal.hidden) closeHintMap();
+  });
 
   testArrivalButton.addEventListener('click', async () => {
     testArrivalButton.disabled = true;

@@ -17,6 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- Styles -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3yn0tBBLZxpLhMZrQ2byxXLegL7A=" crossorigin="">
   <link rel="stylesheet" href="css/main.css">
 
   <!-- Favicon -->
@@ -127,15 +128,39 @@
 
       <div class="arrival-message" id="arrival-message" role="status" hidden></div>
 
-      <button class="test-arrival-button" id="test-arrival-button" type="button">
-        Simular llegada
-      </button>
+      <div class="compass-card__actions">
+        <button class="hint-button" id="hint-button" type="button">
+          <span class="hint-button__icon" aria-hidden="true">⌖</span>
+          Pista
+        </button>
+
+        <button class="test-arrival-button" id="test-arrival-button" type="button">
+          Simular llegada
+        </button>
+      </div>
     </section>
 
-    <p class="experience__privacy">Tu ubicación sólo se usa en este dispositivo y no se guarda.</p>
+    <p class="experience__privacy">Tu ubicación no se guarda. Al usar Pista se envía temporalmente al servicio de rutas.</p>
   </main>
 
+  <div class="hint-modal" id="hint-modal" role="dialog" aria-modal="true" aria-labelledby="hint-modal-title" hidden>
+    <div class="hint-modal__panel">
+      <header class="hint-modal__header">
+        <div>
+          <span class="hint-modal__eyebrow">Una pequeña ayuda</span>
+          <h2 class="hint-modal__title" id="hint-modal-title">Tu camino por Granada</h2>
+        </div>
+        <button class="hint-modal__close" id="hint-modal-close" type="button" aria-label="Cerrar el mapa">×</button>
+      </header>
+
+      <p class="hint-modal__instruction" id="hint-map-instruction" aria-live="polite">Calculando la ruta a pie…</p>
+      <div class="hint-map" id="hint-map" aria-label="Mapa con el recorrido a pie"></div>
+      <p class="hint-modal__note">El punto final permanece en secreto. Sigue el trazado dorado.</p>
+    </div>
+  </div>
+
   <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script type="module" src="js/main.js"></script>
 
 </body>
