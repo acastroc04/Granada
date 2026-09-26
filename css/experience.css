@@ -459,7 +459,18 @@
   box-shadow: 0 10px 28px rgba(0,0,0,.38);
   opacity: 0;
   transform: translateY(12px);
-  animation: arrivalButtonIn .55s 2.35s ease forwards;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .45s ease, transform .45s ease, background .25s ease,
+    color .25s ease, visibility 0s .45s;
+}
+
+.arrival-overlay.is-ready .arrival-continue {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition-delay: 0s;
 }
 
 .arrival-continue:hover,
@@ -498,10 +509,6 @@
   0% { opacity: 0; clip-path: inset(0 100% 0 0); filter: blur(4px); text-shadow: 0 0 12px #fff4bd; }
   35% { opacity: 1; }
   100% { opacity: 1; clip-path: inset(0 0 0 0); filter: blur(0); text-shadow: none; }
-}
-
-@keyframes arrivalButtonIn {
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .hint-modal {
@@ -793,9 +800,10 @@
   .arrival-scroll__roller,
   .arrival-scroll__ornament,
   .arrival-scroll__flourish,
-  .arrival-message,
-  .arrival-continue {
+  .arrival-message {
     animation-duration: .01ms !important;
     animation-delay: 0s !important;
   }
+
+  .arrival-continue { transition-duration: .01ms !important; }
 }

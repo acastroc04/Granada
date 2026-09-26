@@ -21,6 +21,7 @@ let isTracking = false;
 let routePhase = 'idle';
 let trackingGeneration = 0;
 let pendingArrival = null;
+let arrivalRevealTimer;
 let destinationBearing = 0;
 let smoothedHeading = null;
 let needleRotation = 0;
@@ -258,9 +259,18 @@ function showArrival(name, isFinal) {
     ? `¡Enhorabuena! Has llegado a ${name} y has completado todo el recorrido.`
     : `¡Enhorabuena! Has llegado a ${name}.`;
   continueButton.textContent = isFinal ? 'Finalizar' : 'Siguiente punto';
+  clearTimeout(arrivalRevealTimer);
+  overlay.classList.remove('is-ready');
   overlay.hidden = false;
-
-  setTimeout(() => continueButton.focus(), 2350);
+  // Force a clean visual state on repeated arrivals. Mobile browsers do not
+  // always restart a CSS animation after toggling the hidden attribute.
+  void overlay.offsetWidth;
+  const revealDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1900;
+  arrivalRevealTimer = setTimeout(() => {
+    if (routePhase !== 'arrival' || overlay.hidden) return;
+    overlay.classList.add('is-ready');
+    continueButton.focus({ preventScroll: true });
+  }, revealDelay);
 }
 
 function showSavedCompletedRoute() {
@@ -290,8 +300,10 @@ function continueAfterArrival() {
   if (routePhase !== 'arrival' || !pendingArrival) return;
 
   const isFinal = pendingArrival.isFinal;
+  clearTimeout(arrivalRevealTimer);
   pendingArrival = null;
   persistProgress();
+  document.getElementById('arrival-overlay').classList.remove('is-ready');
   document.getElementById('arrival-overlay').hidden = true;
 
   if (isFinal) {

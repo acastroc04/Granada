@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="format-detection" content="telephone=no">
-  <meta name="description" content="Descubre Granada — su Alhambra, el Albaicín, flamenco, tapas y los rincones más mágicos de Andalucía. Una experiencia vintage interactiva.">
+  <meta name="description"
+    content="Descubre Granada — su Alhambra, el Albaicín, flamenco, tapas y los rincones más mágicos de Andalucía. Una experiencia vintage interactiva.">
   <meta name="theme-color" content="#3d2b1a">
 
   <title>Granada — Viaje inolvidable</title>
@@ -14,15 +16,20 @@
   <!-- Preconnect Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Dancing+Script:wght@400;700&display=swap"
+    rel="stylesheet">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
   <link rel="stylesheet" href="css/main.css">
 
   <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏰</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏰</text></svg>">
 </head>
+
 <body>
 
   <!-- ==================== LOADER ==================== -->
@@ -38,32 +45,38 @@
     <div class="mesa" aria-hidden="true">
 
       <div class="foto foto--1">
-        <img class="foto__img" src="images/optimized/alhambra.jpg" alt="" loading="eager" decoding="async" fetchpriority="high" width="220" height="165">
+        <img class="foto__img" src="images/optimized/alhambra.jpg" alt="" loading="eager" decoding="async"
+          fetchpriority="high" width="220" height="165">
         <span class="foto__label">La Alhambra</span>
       </div>
 
       <div class="foto foto--2">
-        <img class="foto__img" src="images/optimized/catedral.jpg" alt="" loading="eager" decoding="async" width="160" height="210">
+        <img class="foto__img" src="images/optimized/catedral.jpg" alt="" loading="eager" decoding="async" width="160"
+          height="210">
         <span class="foto__label">Catedral</span>
       </div>
 
       <div class="foto foto--3">
-        <img class="foto__img" src="images/optimized/albaicin.jpg" alt="" loading="eager" decoding="async" width="200" height="150">
+        <img class="foto__img" src="images/optimized/albaicin.jpg" alt="" loading="eager" decoding="async" width="200"
+          height="150">
         <span class="foto__label">El Albaicín</span>
       </div>
 
       <div class="foto foto--4">
-        <img class="foto__img" src="images/optimized/flamenco.jpg" alt="" loading="lazy" decoding="async" width="150" height="200">
+        <img class="foto__img" src="images/optimized/flamenco.jpg" alt="" loading="lazy" decoding="async" width="150"
+          height="200">
         <span class="foto__label">Flamenco</span>
       </div>
 
       <div class="foto foto--5">
-        <img class="foto__img" src="images/optimized/mirador.jpg" alt="" loading="lazy" decoding="async" width="280" height="158">
+        <img class="foto__img" src="images/optimized/mirador.jpg" alt="" loading="lazy" decoding="async" width="280"
+          height="158">
         <span class="foto__label">Mirador de San Nicolás</span>
       </div>
 
       <div class="foto foto--6">
-        <img class="foto__img" src="images/optimized/tapas.jpg" alt="" loading="lazy" decoding="async" width="195" height="148">
+        <img class="foto__img" src="images/optimized/tapas.jpg" alt="" loading="lazy" decoding="async" width="195"
+          height="148">
         <span class="foto__label">Tapas</span>
       </div>
 
@@ -76,7 +89,7 @@
       <p class="centro__subtitle anim-subtitle">Viaje inolvidable</p>
       <div class="centro__line anim-line" aria-hidden="true"></div>
       <p class="centro__quote anim-quote">
-        Con mucho amor y cariño, de tu novio Alejandro, espero que te guste.
+        Con mucho amor y cariño de tu novio Alejandro, espero que te guste.
       </p>
       <a href="#" class="btn-empezar anim-btn" id="btn-empezar" role="button">
         Empezar
@@ -138,7 +151,8 @@
       </div>
     </section>
 
-    <p class="experience__privacy">Tu ubicación no se guarda. Al usar Pista se envía temporalmente al servicio de rutas.</p>
+    <p class="experience__privacy">Tu ubicación no se guarda. Al usar Pista se envía temporalmente al servicio de rutas.
+    </p>
 
     <div class="arrival-overlay" id="arrival-overlay" hidden>
       <div class="arrival-scroll" role="dialog" aria-modal="true" aria-labelledby="arrival-message">
@@ -172,8 +186,10 @@
   </div>
 
   <!-- Scripts -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script type="module" src="js/main.js"></script>
 
 </body>
+
 </html>
