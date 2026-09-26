@@ -731,6 +731,93 @@
   opacity: 0.55;
 }
 
+/* ========== TEST CONFIRMATION ========== */
+.test-confirmation {
+  position: fixed;
+  inset: 0;
+  z-index: 25000;
+  display: grid;
+  place-items: center;
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  background: rgba(24, 13, 7, 0.8);
+  backdrop-filter: blur(7px);
+  animation: confirmationIn .25s ease;
+}
+
+.test-confirmation__panel {
+  width: min(90vw, 420px);
+  padding: clamp(1.25rem, 5vw, 2rem);
+  border: 1px solid rgba(230, 210, 142, .6);
+  border-radius: 18px;
+  text-align: center;
+  background:
+    linear-gradient(rgba(60,39,22,.97), rgba(38,23,12,.98)),
+    var(--wood-dark);
+  box-shadow: 0 22px 65px rgba(0,0,0,.55), inset 0 0 25px rgba(201,169,78,.08);
+}
+
+.test-confirmation__icon {
+  display: block;
+  color: var(--gold-light);
+  font-size: 1.8rem;
+}
+
+.test-confirmation__title {
+  margin-top: .35rem;
+  color: var(--cream);
+  font-size: clamp(1.35rem, 5vw, 1.8rem);
+}
+
+.test-confirmation__text {
+  margin-top: .55rem;
+  color: var(--sepia-light);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.test-confirmation__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .7rem;
+  margin-top: 1.2rem;
+}
+
+.test-confirmation__cancel,
+.test-confirmation__accept {
+  min-height: 44px;
+  padding: .7rem .8rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.test-confirmation__cancel {
+  border: 1px solid var(--sepia-light);
+  background: transparent;
+  color: var(--cream-dark);
+}
+
+.test-confirmation__accept {
+  border: 1px solid var(--gold);
+  background: linear-gradient(135deg, #74291f, #a84532);
+  color: #fff;
+}
+
+.test-confirmation__cancel:hover,
+.test-confirmation__cancel:focus-visible,
+.test-confirmation__accept:hover,
+.test-confirmation__accept:focus-visible {
+  color: var(--wood-dark);
+  background: var(--gold-light);
+}
+
+@keyframes confirmationIn {
+  from { opacity: 0; transform: scale(.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 .experience__privacy {
   margin: 0.35rem auto 0;
   color: var(--sepia-light);

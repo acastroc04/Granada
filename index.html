@@ -185,6 +185,21 @@
     </div>
   </div>
 
+  <div class="test-confirmation" id="test-confirmation" role="alertdialog" aria-modal="true"
+       aria-labelledby="test-confirmation-title" aria-describedby="test-confirmation-text" hidden>
+    <div class="test-confirmation__panel">
+      <span class="test-confirmation__icon" aria-hidden="true">⚠</span>
+      <h2 class="test-confirmation__title" id="test-confirmation-title">¿Simular la llegada?</h2>
+      <p class="test-confirmation__text" id="test-confirmation-text">
+        Esta acción marcará el punto actual como completado y guardará el progreso.
+      </p>
+      <div class="test-confirmation__actions">
+        <button class="test-confirmation__cancel" id="test-confirmation-cancel" type="button">Cancelar</button>
+        <button class="test-confirmation__accept" id="test-confirmation-accept" type="button">Sí, simular</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

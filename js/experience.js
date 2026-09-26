@@ -629,9 +629,21 @@ export function initExperience() {
   const hintModalClose = document.getElementById('hint-modal-close');
   const arrivalOverlay = document.getElementById('arrival-overlay');
   const arrivalContinue = document.getElementById('arrival-continue');
+  const testConfirmation = document.getElementById('test-confirmation');
+  const testConfirmationTitle = document.getElementById('test-confirmation-title');
+  const testConfirmationText = document.getElementById('test-confirmation-text');
+  const testConfirmationCancel = document.getElementById('test-confirmation-cancel');
+  const testConfirmationAccept = document.getElementById('test-confirmation-accept');
 
   if (!startButton || !backButton || !landing || !experience || !testArrivalButton
-      || !hintButton || !hintModal || !hintModalClose || !arrivalOverlay || !arrivalContinue) return;
+      || !hintButton || !hintModal || !hintModalClose || !arrivalOverlay || !arrivalContinue
+      || !testConfirmation || !testConfirmationTitle || !testConfirmationText
+      || !testConfirmationCancel || !testConfirmationAccept) return;
+
+  const closeTestConfirmation = () => {
+    testConfirmation.hidden = true;
+    testArrivalButton.focus({ preventScroll: true });
+  };
 
   hintButton.addEventListener('click', openHintMap);
   hintModalClose.addEventListener('click', closeHintMap);
@@ -640,10 +652,28 @@ export function initExperience() {
   });
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !hintModal.hidden) closeHintMap();
+    if (event.key === 'Escape' && !testConfirmation.hidden) closeTestConfirmation();
   });
   arrivalContinue.addEventListener('click', continueAfterArrival);
 
-  testArrivalButton.addEventListener('click', async () => {
+  testArrivalButton.addEventListener('click', () => {
+    const isReset = currentDestinationIndex >= locations.length && locations.length > 0;
+    testConfirmationTitle.textContent = isReset ? '¿Reiniciar el recorrido?' : '¿Simular la llegada?';
+    testConfirmationText.textContent = isReset
+      ? 'Esta acción borrará el progreso guardado y volverá al primer punto.'
+      : 'Esta acción marcará el punto actual como completado y guardará el progreso.';
+    testConfirmationAccept.textContent = isReset ? 'Sí, reiniciar' : 'Sí, simular';
+    testConfirmation.hidden = false;
+    testConfirmationAccept.focus({ preventScroll: true });
+  });
+
+  testConfirmationCancel.addEventListener('click', closeTestConfirmation);
+  testConfirmation.addEventListener('click', (event) => {
+    if (event.target === testConfirmation) closeTestConfirmation();
+  });
+
+  testConfirmationAccept.addEventListener('click', async () => {
+    testConfirmation.hidden = true;
     testArrivalButton.disabled = true;
 
     try {
