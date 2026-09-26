@@ -20,6 +20,11 @@ Después, abre `http://localhost:8000`.
 La brújula necesita permiso de ubicación. Fuera de `localhost`, las APIs de
 ubicación y orientación requieren que la web esté publicada mediante HTTPS.
 
+El progreso de la ruta se guarda mediante `localStorage`. Es independiente en
+cada navegador y dispositivo, persiste después de recargar la página y no se
+envía a ningún servidor. Se pierde si el usuario borra los datos del sitio o
+utiliza una sesión privada que no conserve almacenamiento.
+
 ## Estructura
 
 - `index.html`: portada y contenido principal.

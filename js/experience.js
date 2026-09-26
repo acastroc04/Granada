@@ -7,6 +7,7 @@
 const UPDATE_INTERVAL = 3000;
 const ARRIVAL_DISTANCE_METRES = 10;
 const ORIENTATION_SMOOTHING = 0.22;
+const PROGRESS_STORAGE_KEY = 'granada-route-progress-v1';
 const TO_RADIANS = Math.PI / 180;
 const TO_DEGREES = 180 / Math.PI;
 
@@ -21,6 +22,7 @@ let destinationBearing = 0;
 let smoothedHeading = null;
 let needleRotation = 0;
 let orientationFrame;
+let completedLocationIds = new Set();
 
 function normaliseDegrees(value) {
   return (value + 360) % 360;
@@ -65,6 +67,41 @@ function parseLocations(text) {
   });
 }
 
+function getLocationId(location) {
+  return `${location.name}|${location.latitude.toFixed(6)}|${location.longitude.toFixed(6)}`;
+}
+
+function loadProgress() {
+  try {
+    const savedProgress = JSON.parse(localStorage.getItem(PROGRESS_STORAGE_KEY) || '{}');
+    const savedIds = Array.isArray(savedProgress.completedLocationIds)
+      ? savedProgress.completedLocationIds
+      : [];
+    completedLocationIds = new Set(savedIds);
+  } catch {
+    // If storage is unavailable or corrupt, the route safely starts again.
+    completedLocationIds = new Set();
+  }
+
+  const firstPendingIndex = locations.findIndex(
+    (location) => !completedLocationIds.has(getLocationId(location))
+  );
+  currentDestinationIndex = firstPendingIndex === -1 ? locations.length : firstPendingIndex;
+}
+
+function saveCompletedLocation(location) {
+  completedLocationIds.add(getLocationId(location));
+
+  try {
+    localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({
+      completedLocationIds: [...completedLocationIds],
+      updatedAt: new Date().toISOString(),
+    }));
+  } catch {
+    // The current session can continue even when private storage is blocked.
+  }
+}
+
 async function loadLocations() {
   const response = await fetch(new URL('../localizaciones.txt', import.meta.url));
   if (!response.ok) throw new Error(`No se pudo cargar localizaciones.txt (${response.status})`);
@@ -72,6 +109,7 @@ async function loadLocations() {
   const parsedLocations = parseLocations(await response.text());
   if (!parsedLocations.length) throw new Error('localizaciones.txt no contiene destinos válidos');
   locations = parsedLocations;
+  loadProgress();
 }
 
 function calculateBearing(latitude, longitude, destination) {
@@ -183,6 +221,14 @@ function completeRoute(lastDestination) {
   showArrival(lastDestination.name, true);
 }
 
+function showSavedCompletedRoute() {
+  clearInterval(locationTimer);
+  locationTimer = undefined;
+  document.getElementById('location-status').textContent = 'Ruta completada';
+  document.getElementById('location-distance').textContent = '¡Ya completaste todos los destinos!';
+  document.getElementById('location-bearing').textContent = 'Tu progreso está guardado en este dispositivo.';
+}
+
 function processPosition(coords) {
   const destination = locations[currentDestinationIndex];
   if (!destination) return;
@@ -190,6 +236,7 @@ function processPosition(coords) {
   const distanceMetres = calculateDistanceMetres(coords.latitude, coords.longitude, destination);
 
   if (distanceMetres <= ARRIVAL_DISTANCE_METRES) {
+    saveCompletedLocation(destination);
     currentDestinationIndex += 1;
     const routeComplete = currentDestinationIndex >= locations.length;
     showArrival(destination.name, routeComplete);
@@ -262,6 +309,10 @@ async function startLocationUpdates() {
     locationsPromise ||= loadLocations();
     await locationsPromise;
     if (!isTracking) return;
+    if (currentDestinationIndex >= locations.length) {
+      showSavedCompletedRoute();
+      return;
+    }
     updateLocation();
     locationTimer = setInterval(updateLocation, UPDATE_INTERVAL);
   } catch (error) {
