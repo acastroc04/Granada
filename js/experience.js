@@ -102,6 +102,17 @@ function saveCompletedLocation(location) {
   }
 }
 
+function clearSavedProgress() {
+  completedLocationIds = new Set();
+  currentDestinationIndex = 0;
+
+  try {
+    localStorage.removeItem(PROGRESS_STORAGE_KEY);
+  } catch {
+    // The in-memory reset is still useful when storage is unavailable.
+  }
+}
+
 async function loadLocations() {
   const response = await fetch(new URL('../localizaciones.txt', import.meta.url));
   if (!response.ok) throw new Error(`No se pudo cargar localizaciones.txt (${response.status})`);
@@ -227,6 +238,39 @@ function showSavedCompletedRoute() {
   document.getElementById('location-status').textContent = 'Ruta completada';
   document.getElementById('location-distance').textContent = '¡Ya completaste todos los destinos!';
   document.getElementById('location-bearing').textContent = 'Tu progreso está guardado en este dispositivo.';
+  document.getElementById('test-arrival-button').textContent = 'Reiniciar recorrido';
+}
+
+function reachCurrentDestination(currentCoordinates = null) {
+  const destination = locations[currentDestinationIndex];
+  if (!destination) return;
+
+  saveCompletedLocation(destination);
+  currentDestinationIndex += 1;
+  const routeComplete = currentDestinationIndex >= locations.length;
+  showArrival(destination.name, routeComplete);
+
+  if (routeComplete) {
+    completeRoute(destination);
+    document.getElementById('test-arrival-button').textContent = 'Reiniciar recorrido';
+    return;
+  }
+
+  if (currentCoordinates) {
+    const nextDestination = locations[currentDestinationIndex];
+    destinationBearing = calculateBearing(
+      currentCoordinates.latitude,
+      currentCoordinates.longitude,
+      nextDestination
+    );
+    document.getElementById('location-bearing').textContent = `Rumbo ${Math.round(destinationBearing)}°`;
+    rotateNeedle();
+  } else {
+    document.getElementById('location-bearing').textContent = 'Calculando el nuevo rumbo…';
+  }
+
+  document.getElementById('location-status').textContent = 'Destino alcanzado · sigue la aguja';
+  document.getElementById('location-distance').textContent = 'Nuevo destino preparado';
 }
 
 function processPosition(coords) {
@@ -236,22 +280,7 @@ function processPosition(coords) {
   const distanceMetres = calculateDistanceMetres(coords.latitude, coords.longitude, destination);
 
   if (distanceMetres <= ARRIVAL_DISTANCE_METRES) {
-    saveCompletedLocation(destination);
-    currentDestinationIndex += 1;
-    const routeComplete = currentDestinationIndex >= locations.length;
-    showArrival(destination.name, routeComplete);
-
-    if (routeComplete) {
-      completeRoute(destination);
-      return;
-    }
-
-    const nextDestination = locations[currentDestinationIndex];
-    destinationBearing = calculateBearing(coords.latitude, coords.longitude, nextDestination);
-    document.getElementById('location-status').textContent = 'Destino alcanzado · sigue la aguja';
-    document.getElementById('location-distance').textContent = 'Nuevo destino preparado';
-    document.getElementById('location-bearing').textContent = `Rumbo ${Math.round(destinationBearing)}°`;
-    rotateNeedle();
+    reachCurrentDestination(coords);
     return;
   }
 
@@ -335,8 +364,36 @@ export function initExperience() {
   const backButton = document.getElementById('btn-volver');
   const landing = document.getElementById('landing');
   const experience = document.getElementById('experience');
+  const testArrivalButton = document.getElementById('test-arrival-button');
 
-  if (!startButton || !backButton || !landing || !experience) return;
+  if (!startButton || !backButton || !landing || !experience || !testArrivalButton) return;
+
+  testArrivalButton.addEventListener('click', async () => {
+    testArrivalButton.disabled = true;
+
+    try {
+      locationsPromise ||= loadLocations();
+      await locationsPromise;
+
+      if (currentDestinationIndex >= locations.length) {
+        clearSavedProgress();
+        document.getElementById('arrival-message').hidden = true;
+        document.getElementById('location-status').textContent = 'Recorrido reiniciado';
+        document.getElementById('location-distance').textContent = 'Primer destino preparado';
+        document.getElementById('location-bearing').textContent = 'Calculando el rumbo…';
+        testArrivalButton.textContent = 'Simular llegada';
+        isTracking = true;
+        startLocationUpdates();
+      } else {
+        reachCurrentDestination();
+      }
+    } catch (error) {
+      console.error(error);
+      document.getElementById('location-status').textContent = 'No se ha podido cargar la ruta de prueba.';
+    } finally {
+      testArrivalButton.disabled = false;
+    }
+  });
 
   startButton.addEventListener('click', (event) => {
     event.preventDefault();

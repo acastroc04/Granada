@@ -283,6 +283,32 @@
   animation: arrivalIn 0.45s var(--ease-smooth);
 }
 
+.test-arrival-button {
+  margin-top: 1rem;
+  padding: 0.65rem 1rem;
+  border: 1px dashed rgba(230, 210, 142, 0.7);
+  border-radius: 8px;
+  background: rgba(42, 28, 16, 0.65);
+  color: var(--sepia-light);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease,
+    background var(--duration-fast) ease;
+}
+
+.test-arrival-button:hover,
+.test-arrival-button:focus-visible {
+  border-color: var(--gold-light);
+  background: rgba(201, 169, 78, 0.16);
+  color: var(--cream);
+}
+
+.test-arrival-button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
 @keyframes arrivalIn {
   from { opacity: 0; transform: translateY(8px) scale(0.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
