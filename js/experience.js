@@ -16,9 +16,11 @@ let locations = [];
 let locationsPromise;
 let currentDestinationIndex = 0;
 let locationTimer;
-let arrivalTimer;
 let locationRequestInProgress = false;
 let isTracking = false;
+let routePhase = 'idle';
+let trackingGeneration = 0;
+let pendingArrival = null;
 let destinationBearing = 0;
 let smoothedHeading = null;
 let needleRotation = 0;
@@ -83,23 +85,40 @@ function loadProgress() {
       ? savedProgress.completedLocationIds
       : [];
     completedLocationIds = new Set(savedIds);
+    pendingArrival = savedProgress.pendingArrival || null;
   } catch {
     // If storage is unavailable or corrupt, the route safely starts again.
     completedLocationIds = new Set();
+    pendingArrival = null;
   }
 
   const firstPendingIndex = locations.findIndex(
     (location) => !completedLocationIds.has(getLocationId(location))
   );
   currentDestinationIndex = firstPendingIndex === -1 ? locations.length : firstPendingIndex;
+
+  if (pendingArrival) {
+    const arrivedLocation = locations.find(
+      (location) => getLocationId(location) === pendingArrival.locationId
+    );
+
+    if (!arrivedLocation || !completedLocationIds.has(pendingArrival.locationId)) {
+      pendingArrival = null;
+      persistProgress();
+    } else {
+      pendingArrival.name = arrivedLocation.name;
+      pendingArrival.isFinal = locations.every(
+        (location) => completedLocationIds.has(getLocationId(location))
+      );
+    }
+  }
 }
 
-function saveCompletedLocation(location) {
-  completedLocationIds.add(getLocationId(location));
-
+function persistProgress() {
   try {
     localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({
       completedLocationIds: [...completedLocationIds],
+      pendingArrival,
       updatedAt: new Date().toISOString(),
     }));
   } catch {
@@ -107,9 +126,21 @@ function saveCompletedLocation(location) {
   }
 }
 
+function saveCompletedLocation(location, isFinal) {
+  completedLocationIds.add(getLocationId(location));
+  pendingArrival = {
+    locationId: getLocationId(location),
+    name: location.name,
+    isFinal,
+  };
+  persistProgress();
+}
+
 function clearSavedProgress() {
   completedLocationIds = new Set();
   currentDestinationIndex = 0;
+  pendingArrival = null;
+  routePhase = 'idle';
 
   try {
     localStorage.removeItem(PROGRESS_STORAGE_KEY);
@@ -159,6 +190,7 @@ function formatDistance(distanceMetres) {
 }
 
 function rotateNeedle() {
+  if (routePhase !== 'tracking') return;
   const needle = document.getElementById('compass-needle');
   if (!needle) return;
 
@@ -211,71 +243,68 @@ async function enableOrientation() {
   }
 }
 
-function showArrival(name, routeComplete) {
+function showArrival(name, isFinal) {
+  stopLocationUpdates();
+  routePhase = 'arrival';
+
+  const overlay = document.getElementById('arrival-overlay');
   const message = document.getElementById('arrival-message');
-  if (!message) return;
+  const continueButton = document.getElementById('arrival-continue');
+  const hintModal = document.getElementById('hint-modal');
+  if (!overlay || !message || !continueButton) return;
 
-  clearTimeout(arrivalTimer);
-  message.textContent = routeComplete
-    ? `¡Enhorabuena, has llegado a ${name}! Has completado la ruta.`
-    : `¡Enhorabuena, has llegado a ${name}! Buscando el siguiente destino…`;
-  message.hidden = false;
+  if (hintModal) hintModal.hidden = true;
+  message.textContent = isFinal
+    ? `¡Enhorabuena! Has llegado a ${name} y has completado todo el recorrido.`
+    : `¡Enhorabuena! Has llegado a ${name}.`;
+  continueButton.textContent = isFinal ? 'Finalizar' : 'Siguiente punto';
+  overlay.hidden = false;
 
-  if (!routeComplete) {
-    arrivalTimer = setTimeout(() => {
-      message.hidden = true;
-    }, 4000);
-  }
-}
-
-function completeRoute(lastDestination) {
-  clearInterval(locationTimer);
-  locationTimer = undefined;
-  document.getElementById('location-status').textContent = 'Ruta completada';
-  document.getElementById('location-distance').textContent = '¡Lo conseguiste!';
-  document.getElementById('location-bearing').textContent = '';
-  showArrival(lastDestination.name, true);
+  setTimeout(() => continueButton.focus(), 2350);
 }
 
 function showSavedCompletedRoute() {
-  clearInterval(locationTimer);
-  locationTimer = undefined;
+  stopLocationUpdates();
+  routePhase = 'complete';
   document.getElementById('location-status').textContent = 'Ruta completada';
   document.getElementById('location-distance').textContent = '¡Ya completaste todos los destinos!';
   document.getElementById('location-bearing').textContent = 'Tu progreso está guardado en este dispositivo.';
   document.getElementById('test-arrival-button').textContent = 'Reiniciar recorrido';
 }
 
-function reachCurrentDestination(currentCoordinates = null) {
+function reachCurrentDestination() {
+  if (routePhase !== 'tracking') return;
   const destination = locations[currentDestinationIndex];
   if (!destination) return;
 
-  saveCompletedLocation(destination);
-  currentDestinationIndex += 1;
-  const routeComplete = currentDestinationIndex >= locations.length;
-  showArrival(destination.name, routeComplete);
+  const isFinal = currentDestinationIndex === locations.length - 1;
+  saveCompletedLocation(destination, isFinal);
+  const nextPendingIndex = locations.findIndex(
+    (location) => !completedLocationIds.has(getLocationId(location))
+  );
+  currentDestinationIndex = nextPendingIndex === -1 ? locations.length : nextPendingIndex;
+  showArrival(destination.name, isFinal);
+}
 
-  if (routeComplete) {
-    completeRoute(destination);
-    document.getElementById('test-arrival-button').textContent = 'Reiniciar recorrido';
+function continueAfterArrival() {
+  if (routePhase !== 'arrival' || !pendingArrival) return;
+
+  const isFinal = pendingArrival.isFinal;
+  pendingArrival = null;
+  persistProgress();
+  document.getElementById('arrival-overlay').hidden = true;
+
+  if (isFinal) {
+    routePhase = 'complete';
+    window.location.assign('final.html');
     return;
   }
 
-  if (currentCoordinates) {
-    const nextDestination = locations[currentDestinationIndex];
-    destinationBearing = calculateBearing(
-      currentCoordinates.latitude,
-      currentCoordinates.longitude,
-      nextDestination
-    );
-    document.getElementById('location-bearing').textContent = '';
-    rotateNeedle();
-  } else {
-    document.getElementById('location-bearing').textContent = 'Calculando el nuevo rumbo…';
-  }
-
-  document.getElementById('location-status').textContent = 'Destino alcanzado · sigue la aguja';
-  document.getElementById('location-distance').textContent = 'Nuevo destino preparado';
+  routePhase = 'idle';
+  document.getElementById('location-status').textContent = 'Preparando el siguiente punto…';
+  document.getElementById('location-distance').textContent = '—';
+  document.getElementById('location-bearing').textContent = '';
+  startLocationUpdates();
 }
 
 function processPosition(coords) {
@@ -291,7 +320,7 @@ function processPosition(coords) {
   const distanceMetres = calculateDistanceMetres(coords.latitude, coords.longitude, destination);
 
   if (distanceMetres <= ARRIVAL_DISTANCE_METRES) {
-    reachCurrentDestination(coords);
+    reachCurrentDestination();
     return;
   }
 
@@ -304,7 +333,7 @@ function processPosition(coords) {
   rotateNeedle();
 }
 
-function updateLocation() {
+function updateLocation(requireFreshPosition = false) {
   const status = document.getElementById('location-status');
   const distance = document.getElementById('location-distance');
   const bearing = document.getElementById('location-bearing');
@@ -315,16 +344,19 @@ function updateLocation() {
     return;
   }
 
-  if (!isTracking || locationRequestInProgress) return;
+  if (!isTracking || routePhase !== 'tracking' || locationRequestInProgress) return;
 
   status.textContent = 'Buscando tu ubicación…';
   locationRequestInProgress = true;
+  const requestGeneration = trackingGeneration;
   navigator.geolocation.getCurrentPosition(
     ({ coords }) => {
+      if (requestGeneration !== trackingGeneration || routePhase !== 'tracking') return;
       locationRequestInProgress = false;
       if (isTracking) processPosition(coords);
     },
     (error) => {
+      if (requestGeneration !== trackingGeneration || routePhase !== 'tracking') return;
       locationRequestInProgress = false;
       if (!isTracking) return;
       const messages = {
@@ -336,24 +368,36 @@ function updateLocation() {
       distance.textContent = '—';
       bearing.textContent = '';
     },
-    { enableHighAccuracy: true, maximumAge: 2000, timeout: 8000 }
+    {
+      enableHighAccuracy: true,
+      maximumAge: requireFreshPosition ? 0 : 2000,
+      timeout: requireFreshPosition ? 10000 : 8000,
+    }
   );
 }
 
 async function startLocationUpdates() {
   const status = document.getElementById('location-status');
   clearInterval(locationTimer);
+  trackingGeneration += 1;
+  const startGeneration = trackingGeneration;
+  locationRequestInProgress = false;
   isTracking = true;
+  routePhase = 'tracking';
 
   try {
     locationsPromise ||= loadLocations();
     await locationsPromise;
-    if (!isTracking) return;
+    if (!isTracking || startGeneration !== trackingGeneration) return;
+    if (pendingArrival) {
+      showArrival(pendingArrival.name, pendingArrival.isFinal);
+      return;
+    }
     if (currentDestinationIndex >= locations.length) {
       showSavedCompletedRoute();
       return;
     }
-    updateLocation();
+    updateLocation(true);
     locationTimer = setInterval(updateLocation, UPDATE_INTERVAL);
   } catch (error) {
     console.error(error);
@@ -363,8 +407,8 @@ async function startLocationUpdates() {
 }
 
 function stopLocationUpdates() {
+  trackingGeneration += 1;
   clearInterval(locationTimer);
-  clearTimeout(arrivalTimer);
   locationTimer = undefined;
   isTracking = false;
   locationRequestInProgress = false;
@@ -483,20 +527,27 @@ async function openHintMap() {
   instruction.textContent = 'Localizando tu posición…';
 
   try {
+    if (routePhase !== 'tracking') throw new Error('Continúa al siguiente punto antes de pedir una pista.');
     // Render the map immediately; GPS and routing can finish afterwards.
     initialiseHintMap(GRANADA_CENTRE.latitude, GRANADA_CENTRE.longitude);
     locationsPromise ||= loadLocations();
     await locationsPromise;
     const destination = locations[currentDestinationIndex];
     if (!destination) throw new Error('Ya has completado todos los destinos de la ruta.');
+    const destinationId = getLocationId(destination);
+    const hintGeneration = trackingGeneration;
 
     // Always request a new fix when Pista is pressed. This makes the next
     // street advance together with the person instead of reusing an old route.
     const origin = await requestCurrentPosition();
+    if (routePhase !== 'tracking' || hintGeneration !== trackingGeneration
+        || getLocationId(locations[currentDestinationIndex]) !== destinationId) return;
     initialiseHintMap(origin.latitude, origin.longitude);
     instruction.textContent = 'Buscando el mejor camino a pie…';
 
     const route = await loadWalkingRoute(origin, destination);
+    if (routePhase !== 'tracking' || hintGeneration !== trackingGeneration
+        || getLocationId(locations[currentDestinationIndex]) !== destinationId) return;
     const steps = route.legs?.[0]?.steps || [];
     const nextStreet = findNextStreet(steps);
     const routeCoordinates = getStreetHintCoordinates(route, nextStreet);
@@ -564,9 +615,11 @@ export function initExperience() {
   const hintButton = document.getElementById('hint-button');
   const hintModal = document.getElementById('hint-modal');
   const hintModalClose = document.getElementById('hint-modal-close');
+  const arrivalOverlay = document.getElementById('arrival-overlay');
+  const arrivalContinue = document.getElementById('arrival-continue');
 
   if (!startButton || !backButton || !landing || !experience || !testArrivalButton
-      || !hintButton || !hintModal || !hintModalClose) return;
+      || !hintButton || !hintModal || !hintModalClose || !arrivalOverlay || !arrivalContinue) return;
 
   hintButton.addEventListener('click', openHintMap);
   hintModalClose.addEventListener('click', closeHintMap);
@@ -576,6 +629,7 @@ export function initExperience() {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !hintModal.hidden) closeHintMap();
   });
+  arrivalContinue.addEventListener('click', continueAfterArrival);
 
   testArrivalButton.addEventListener('click', async () => {
     testArrivalButton.disabled = true;
@@ -586,7 +640,7 @@ export function initExperience() {
 
       if (currentDestinationIndex >= locations.length) {
         clearSavedProgress();
-        document.getElementById('arrival-message').hidden = true;
+        arrivalOverlay.hidden = true;
         document.getElementById('location-status').textContent = 'Recorrido reiniciado';
         document.getElementById('location-distance').textContent = 'Primer destino preparado';
         document.getElementById('location-bearing').textContent = 'Calculando el rumbo…';

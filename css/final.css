@@ -1,0 +1,158 @@
+@import url('variables.css');
+@import url('reset.css');
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  color: var(--cream);
+  background: var(--wood-dark);
+}
+
+.finale {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  padding: max(1.25rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+    max(1.25rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  background-image:
+    linear-gradient(180deg, rgba(31,18,9,.28), rgba(31,18,9,.72)),
+    url('../images/optimized/alhambra.jpg');
+  background-position: center;
+  background-size: cover;
+  animation: finaleReveal 1.5s ease both;
+}
+
+.finale__veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at center, transparent 20%, rgba(22,12,6,.48) 100%),
+    linear-gradient(135deg, rgba(201,169,78,.12), transparent 45%);
+}
+
+.finale__message {
+  width: min(90vw, 680px);
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+  border: 1px solid rgba(230,210,142,.55);
+  border-radius: 4px;
+  text-align: center;
+  background:
+    linear-gradient(rgba(42,28,16,.72), rgba(42,28,16,.84)),
+    radial-gradient(circle, rgba(201,169,78,.2), transparent 70%);
+  box-shadow: 0 25px 80px rgba(0,0,0,.55), inset 0 0 35px rgba(230,210,142,.08);
+  backdrop-filter: blur(8px);
+  animation: messageRise 1s .35s var(--ease-smooth) both;
+}
+
+.finale__ornament {
+  color: var(--gold-light);
+  letter-spacing: .45em;
+}
+
+.finale__eyebrow {
+  margin-top: .8rem;
+  color: var(--cream-dark);
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 3vw, 1.35rem);
+}
+
+.finale__title {
+  margin-top: .2rem;
+  color: var(--gold-light);
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 9vw, 5rem);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 4px 18px rgba(0,0,0,.5);
+}
+
+.finale__line {
+  width: min(240px, 65%);
+  height: 1px;
+  margin: 1.1rem auto;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.finale__love {
+  color: #fff;
+  font-family: var(--font-script);
+  font-size: clamp(2.1rem, 8vw, 4.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  text-shadow: 0 3px 16px rgba(0,0,0,.55);
+}
+
+.finale__closing {
+  max-width: 440px;
+  margin: 1.1rem auto 0;
+  color: var(--cream-dark);
+  font-family: var(--font-body);
+  font-size: clamp(.95rem, 2.5vw, 1.15rem);
+}
+
+.finale__back {
+  display: inline-block;
+  margin-top: 1.3rem;
+  padding: .7rem 1.25rem;
+  border: 1px solid rgba(230,210,142,.65);
+  border-radius: 999px;
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: .95rem;
+  transition: background .25s ease, color .25s ease, transform .25s ease;
+}
+
+.finale__back:hover,
+.finale__back:focus-visible {
+  color: var(--wood-dark);
+  background: var(--gold-light);
+  transform: translateY(-2px);
+}
+
+@keyframes finaleReveal {
+  from { opacity: 0; transform: scale(1.04); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes messageRise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-height: 620px) {
+  .finale__message { padding: 1rem 1.25rem; }
+  .finale__eyebrow { margin-top: .35rem; }
+  .finale__line { margin: .6rem auto; }
+  .finale__closing { margin-top: .65rem; }
+  .finale__back { margin-top: .7rem; }
+}
+
+@media (max-width: 480px) {
+  .finale { padding-inline: .65rem; }
+
+  .finale__message {
+    width: 100%;
+    padding: 1.35rem .85rem;
+  }
+
+  .finale__ornament { letter-spacing: .25em; }
+  .finale__eyebrow { font-size: .94rem; }
+  .finale__title { font-size: clamp(2rem, 10.5vw, 2.8rem); }
+  .finale__love { font-size: clamp(2.15rem, 11vw, 3rem); }
+  .finale__closing { padding-inline: .25rem; font-size: .92rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .finale,
+  .finale__message { animation: none; }
+}

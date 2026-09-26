@@ -25,6 +25,10 @@ cada navegador y dispositivo, persiste después de recargar la página y no se
 envía a ningún servidor. Se pierde si el usuario borra los datos del sitio o
 utiliza una sesión privada que no conserve almacenamiento.
 
+Al alcanzar un destino, el seguimiento se pausa y la llegada queda guardada
+hasta que se pulse `Siguiente punto`. En el último destino, `Finalizar` abre
+`final.html`, la pantalla de cierre del recorrido.
+
 El botón `Pista` muestra un mapa de OpenStreetMap y solicita una ruta peatonal
 al servidor público de FOSSGIS. No necesita clave de API. El nombre del destino
 permanece oculto, pero la ubicación actual y el punto final se envían al
@@ -39,5 +43,5 @@ una ubicación nueva al dispositivo y recalcula desde cero la siguiente calle.
 - `js/experience.js`: transición, geolocalización y cálculo del rumbo.
 - `localizaciones.txt`: destinos de la ruta en orden, uno por línea, con el
   formato `Nombre:latitud,longitud`.
-- `images/`: originales de alta resolución.
-- `images/optimized/`: versiones ligeras utilizadas por la portada.
+- `final.html` y `css/final.css`: página final tras completar la ruta.
+- `images/optimized/`: imágenes ligeras utilizadas por la experiencia.

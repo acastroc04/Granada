@@ -9,7 +9,7 @@
   <meta name="description" content="Descubre Granada — su Alhambra, el Albaicín, flamenco, tapas y los rincones más mágicos de Andalucía. Una experiencia vintage interactiva.">
   <meta name="theme-color" content="#3d2b1a">
 
-  <title>Granada — Recuerdos de Andalucía</title>
+  <title>Granada — Viaje inolvidable</title>
 
   <!-- Preconnect Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,8 +126,6 @@
         <p class="compass-card__bearing" id="location-bearing"></p>
       </div>
 
-      <div class="arrival-message" id="arrival-message" role="status" hidden></div>
-
       <div class="compass-card__actions">
         <button class="hint-button" id="hint-button" type="button">
           <span class="hint-button__icon" aria-hidden="true">⌖</span>
@@ -141,6 +139,20 @@
     </section>
 
     <p class="experience__privacy">Tu ubicación no se guarda. Al usar Pista se envía temporalmente al servicio de rutas.</p>
+
+    <div class="arrival-overlay" id="arrival-overlay" hidden>
+      <div class="arrival-scroll" role="dialog" aria-modal="true" aria-labelledby="arrival-message">
+        <div class="arrival-scroll__roller arrival-scroll__roller--top" aria-hidden="true"></div>
+        <div class="arrival-scroll__paper">
+          <span class="arrival-scroll__ornament" aria-hidden="true">✦</span>
+          <p class="arrival-message" id="arrival-message" role="status"></p>
+          <span class="arrival-scroll__flourish" aria-hidden="true">❦</span>
+        </div>
+        <div class="arrival-scroll__roller arrival-scroll__roller--bottom" aria-hidden="true"></div>
+      </div>
+
+      <button class="arrival-continue" id="arrival-continue" type="button">Siguiente punto</button>
+    </div>
   </main>
 
   <div class="hint-modal" id="hint-modal" role="dialog" aria-modal="true" aria-labelledby="hint-modal-title" hidden>
