@@ -85,7 +85,7 @@
 
   </main>
 
-  <!-- ==================== BRÚJULA HACIA LA ALHAMBRA ==================== -->
+  <!-- ==================== BRÚJULA DE LA RUTA ==================== -->
   <main class="experience" id="experience" hidden>
     <button class="experience__back" id="btn-volver" type="button" aria-label="Volver a la portada">
       <span aria-hidden="true">←</span> Volver
@@ -93,12 +93,12 @@
 
     <header class="experience__header">
       <span class="experience__eyebrow">Tu próximo destino</span>
-      <h2 class="experience__title">Rumbo a la Alhambra</h2>
+      <h2 class="experience__title">Sigue la brújula</h2>
       <p class="experience__intro">Sigue la aguja dorada y deja que Granada te guíe.</p>
     </header>
 
     <section class="compass-card" aria-labelledby="compass-title">
-      <h3 class="sr-only" id="compass-title">Brújula hacia la Alhambra</h3>
+      <h3 class="sr-only" id="compass-title">Brújula de la ruta por Granada</h3>
 
       <div class="compass" id="compass" aria-hidden="true">
         <div class="compass__wood-ring">
@@ -124,6 +124,8 @@
         <p class="compass-card__distance" id="location-distance">—</p>
         <p class="compass-card__bearing" id="location-bearing"></p>
       </div>
+
+      <div class="arrival-message" id="arrival-message" role="status" hidden></div>
     </section>
 
     <p class="experience__privacy">Tu ubicación sólo se usa en este dispositivo y no se guarda.</p>

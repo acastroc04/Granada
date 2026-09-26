@@ -207,7 +207,8 @@
   left: calc(50% - 8px);
   width: 16px;
   transform: rotate(var(--needle-angle));
-  transition: transform 0.65s cubic-bezier(.22,.8,.3,1);
+  will-change: transform;
+  transition: transform 0.18s linear;
 }
 
 .compass__needle-tip,
@@ -266,6 +267,25 @@
 .compass-card__bearing {
   color: var(--cream-dark);
   font-size: 0.9rem;
+}
+
+.arrival-message {
+  margin-top: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(201, 169, 78, 0.2), rgba(92, 74, 50, 0.55));
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  animation: arrivalIn 0.45s var(--ease-smooth);
+}
+
+@keyframes arrivalIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .experience__privacy {

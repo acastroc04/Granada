@@ -2,7 +2,7 @@
 
 Experiencia interactiva de estética vintage inspirada en Granada. La portada
 da paso a una brújula que utiliza la ubicación y orientación del dispositivo
-para señalar hacia la Alhambra.
+para recorrer una ruta de destinos secretos.
 
 ## Ejecutar en local
 
@@ -26,5 +26,7 @@ ubicación y orientación requieren que la web esté publicada mediante HTTPS.
 - `css/`: estilos separados por responsabilidad.
 - `js/`: loader y efectos de movimiento.
 - `js/experience.js`: transición, geolocalización y cálculo del rumbo.
+- `localizaciones.txt`: destinos de la ruta en orden, uno por línea, con el
+  formato `Nombre:latitud,longitud`.
 - `images/`: originales de alta resolución.
 - `images/optimized/`: versiones ligeras utilizadas por la portada.
